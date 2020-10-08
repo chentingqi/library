@@ -7,7 +7,7 @@ def codePull = new org.devops.codePull()
 
 
 
-String workspace = "/data/jenkins_home/workspace"
+//String workspace = "/data/jenkins_home/workspace"
 
 //Pipeline
 pipeline {
