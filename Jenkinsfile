@@ -36,6 +36,7 @@ pipeline {
                     script{ //填写运行代码
                         print('获取代码')
                         tools.PrintMes("获取代码",'green')
+                        echo "origin：${git_url}"
                         codePull.gitPull("${git_url}","${git_branch}","${git_cert}")
                         sleep 3
                         
