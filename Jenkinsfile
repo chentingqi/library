@@ -23,9 +23,9 @@ pipeline {
         timeout(time: 1, unit: 'HOURS')  //流水线超时设置1h
     }
     environment {
-        git_url = "https://git.youlu.com/yunwei-devops/sonar-ali.git"
-        git_branch = "master"
-        git_cert = "chenjingtao-git"
+        giturl = "https://git.youlu.com/yunwei-devops/sonar-ali.git"
+        gitbranch = "master"
+        gitcert = "chenjingtao-git"
     }
 
     stages {
@@ -36,8 +36,8 @@ pipeline {
                     script{ //填写运行代码
                         print('获取代码')
                         tools.PrintMes("获取代码",'green')
-                        echo "origin：${git_url}   branch: ${git_branch},  凭据：${git_cert}"
-                        codePull.gitPull("${git_url}","${git_branch}","${git_cert}")
+                        echo "origin：${giturl}   branch: ${gitbranch},  凭据：${gitcert}"
+                        codePull.gitPull("${giturl}","${gitbranch}","${gitcert}")
                         sleep 3
                         
                         //input id: 'Test', message: '我们是否要继续？', ok: '是，继续吧！', parameters: [choice(choices: ['a', 'b'], description: '', name: 'test1')], submitter: 'lizeyang,admin'
