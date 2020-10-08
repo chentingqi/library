@@ -1,4 +1,4 @@
-package src/org/devops
+package src.org.devops
 
 def gitPull(git_url,git_branch,git_cert){
     git branch: "${git_url}", credentialsId: "${git_cert}", url: "${git_branch}"
