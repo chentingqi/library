@@ -3,6 +3,7 @@
 @Library('library-test') _
 
 def tools = new org.devops.tools()
+def codePull = new org.devops.codePull()
 
 
 
@@ -21,6 +22,11 @@ pipeline {
         disableConcurrentBuilds() //禁止并行
         timeout(time: 1, unit: 'HOURS')  //流水线超时设置1h
     }
+    environment {
+        git_url = "https://git.youlu.com/yunwei-devops/sonar-ali.git"
+        git_branch = "master"
+        git_cert = "chenjingtao-git"
+    }
 
     stages {
         //下载代码
@@ -30,7 +36,7 @@ pipeline {
                     script{ //填写运行代码
                         print('获取代码')
                         tools.PrintMes("获取代码",'green')
-                        println('test')
+                        codePull.gitPull("git_url","git_branch","git_cert")
                         sleep 3
                         
                         //input id: 'Test', message: '我们是否要继续？', ok: '是，继续吧！', parameters: [choice(choices: ['a', 'b'], description: '', name: 'test1')], submitter: 'lizeyang,admin'
