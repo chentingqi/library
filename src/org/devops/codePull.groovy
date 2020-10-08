@@ -1,7 +1,7 @@
 package src.org.devops
 
 def gitPull(git_url,git_branch,git_cert){
-    git branch: 'git_url', credentialsId: 'git_cert', url: 'git_branch'
+    git branch: 'git_branch', credentialsId: 'git_cert', url: 'git_url'
 }
 
 def svnPull(svn_url,svn_cert){
