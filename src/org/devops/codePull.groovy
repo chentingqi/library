@@ -1,7 +1,12 @@
 package src.org.devops
 
 def gitPull(giturl,gitbranch,gitcert){
-    git branch: 'gitbranch', credentialsId: 'gitcert', url: 'giturl'
+//    git branch: 'gitbranch', credentialsId: 'gitcert', url: 'giturl'
+      checkout([$class: 'GitSCM', branches: [[name: "${gitbranch}"]], 
+                doGenerateSubmoduleConfigurations: false, 
+                extensions: [], submoduleCfg: [], 
+                userRemoteConfigs: [[credentialsId: "${gitcert}", 
+                url: "${giturl}"]]])
 }
 
 def svnPull(svn_url,svn_cert){
