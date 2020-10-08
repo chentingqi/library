@@ -38,8 +38,33 @@ pipeline {
                 }
             }
         }
+        
+        stage("CodeScan"){
+                    steps{
+                        timeout(time:30, unit:"MINUTES"){
+                            script{
+                                print("代码扫描")
+                                tools.PrintMes("代码扫描",'green')
+                            }
+                        }
+                    }
+                }
+        stage("Build"){
+                    steps{
+                        timeout(time:20, unit:"MINUTES"){
+                            script{ //填写运行代码
+                                  print('应用打包')
+                                  tools.PrintMes("应用打包",'green')
+                                //mvnHome = tool "m2"
+                                //println(mvnHome)
+                                  sleep 3
+                                //sh "${mvnHome}/bin/mvn --version"
+                            }
+                        }
+                    }
+                }
 
-        stage("01"){
+        /*stage("01"){
             failFast true
             parallel {
         
@@ -71,7 +96,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
     }
 
     //构建后操作
