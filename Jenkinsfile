@@ -53,7 +53,7 @@ pipeline {
                                 //mvnHome = tool "m2"
                                 //println(mvnHome)
                                 
-                                sh "${mvnHome}/bin/mvn --version"
+                                //sh "${mvnHome}/bin/mvn --version"
                             }
                         }
                     }
