@@ -31,6 +31,7 @@ pipeline {
                         print('获取代码')
                         tools.PrintMes("获取代码",'green')
                         println('test')
+                        sleep 3
                         
                         //input id: 'Test', message: '我们是否要继续？', ok: '是，继续吧！', parameters: [choice(choices: ['a', 'b'], description: '', name: 'test1')], submitter: 'lizeyang,admin'
                     }
@@ -51,7 +52,7 @@ pipeline {
                                   tools.PrintMes("应用打包",'green')
                                 //mvnHome = tool "m2"
                                 //println(mvnHome)
-                                
+                                  sleep 3
                                 //sh "${mvnHome}/bin/mvn --version"
                             }
                         }
