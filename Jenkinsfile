@@ -36,6 +36,7 @@ pipeline {
         PROD_IP = "192.168.10.83"
         DEPLOY_DIR = "/data/"
         DEPLOY_COMMAND = "/data/"
+        JAR = "target/sonar-pmd-plugin-2.6.jar"
 
     }
     parameters {
