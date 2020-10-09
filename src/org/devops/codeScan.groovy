@@ -3,7 +3,7 @@ package org.devops
 
 //代码扫描
 def codeScan(projectType,srcDir,serviceName){
-    def scanHome = "/data/sonar-scanner"
+    def scanHome = "/data/sonar-scanner-3.0.0.702-linux"
     if (projectType == 'java'){
         try {
             sh """
