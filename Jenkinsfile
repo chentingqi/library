@@ -7,7 +7,8 @@ def codePull = new org.devops.codePull()
 def codeScan = new org.devops.codeScan()
 def codeBuild = new org.devops.codeBuild()
 def deployService = new org.devops.deployService()
-
+def logCheck = new org.devops.logCheck()
+def serviceCheck = new org.devops.serviceCheck()
 
 //String workspace = "/data/jenkins_home/workspace"
 
@@ -37,7 +38,8 @@ pipeline {
         DEPLOY_DIR = "/data/"
         DEPLOY_COMMAND = "/data/deploy_service.sh"
         JAR = "target/sonar-pmd-plugin-2.6.jar"
-
+        APP_LOG = "/data/app.log"
+        SERVICE_NAME = "salt"
     }
     parameters {
     choice(
@@ -100,11 +102,82 @@ pipeline {
                    
                                        }
                                   }
+                                  if (params.ENV == "uat") {
+                                      for (item in UAT_IP.tokenize(',')){
+                                          echo "deploy ${ENV}" 
+                                          echo "deploy ${item}"
+                                          deployService.deployService("salt","${JAR}","${item}","${JOB_NAME}","${DEPLOY_DIR}","${DEPLOY_COMMAND}",)
+                   
+                                       }
+                                  }
+                                  if (params.ENV == "prod") {
+                                      for (item in PROD_IP.tokenize(',')){
+                                          echo "deploy ${ENV}" 
+                                          echo "deploy ${item}"
+                                          deployService.deployService("salt","${JAR}","${item}","${JOB_NAME}","${DEPLOY_DIR}","${DEPLOY_COMMAND}",)
+                   
+                                       }
+                                  }
+                                  if (params.ENV == "roleback") {
+                                      for (item in PROD_IP.tokenize(',')){
+                                          echo "deploy ${ENV}" 
+                                          echo "deploy ${item}"
+                                          deployService.deployService("salt","${JAR}","${item}","${JOB_NAME}","${DEPLOY_DIR}","${DEPLOY_COMMAND}",)
+                   
+                                       }
+                                  }
 
                             }
                         }
                     }
         }
+        stage("log_check"){
+                    steps{
+                        timeout(time:20, unit:"MINUTES"){
+                            script{
+                                  print('日志检查')
+                                  tools.PrintMes("日志检查",'green')
+                                   if (params.ENV == "test") {
+                                      for (item in TEST_IP.tokenize(',')){
+                                          echo "回显节点${item}服务最后100行日志" 
+                                          logCheck.logCheck("salt","${item}","${JOB_NAME}","${APP_LOG}")
+                   
+                                       }
+                                  }
+                                  
+                            }
+                        }
+                    }
+        }
+        stage("service_check"){
+                    steps{
+                        timeout(time:20, unit:"MINUTES"){
+                            script{
+                                  print('服务检查')
+                                  tools.PrintMes("服务检查",'green')
+                                  if (params.ENV == "test") {
+                                      for (item in TEST_IP.tokenize(',')){
+                                          echo "检查节点服务状态" 
+                                          serviceCheck.serviceCheck("salt","${item}","${JOB_NAME}","${SERVICE_NAME}")
+                   
+                                       }
+                                  }
+                            }
+                        }
+                    }
+        }
+        stage("nexus_push"){
+                    steps{
+                        timeout(time:20, unit:"MINUTES"){
+                            script{
+                                  print('制品上传')
+                                  tools.PrintMes("制品上传",'green')
+                                  
+                            }
+                        }
+                    }
+        }
+                
         
     }
 
