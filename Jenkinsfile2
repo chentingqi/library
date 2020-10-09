@@ -4,8 +4,9 @@
 
 devopsGit([
       node: "master",
-      git_url: "https://git.youlu.com/yunwei-devops/sonar-ali.git",
-      git_cert: "chenjingtao-git",
+      giturl: "https://git.youlu.com/yunwei-devops/sonar-ali.git",
+      gitbranch: "master",
+      gitcert: "chenjingtao-git",
       jdkversion = "jdk8"
       buildType = "maven"
       buildShell: "/data/apache-maven-3.6.3/bin/mvn clean package -Dmaven.test.skip=true",
