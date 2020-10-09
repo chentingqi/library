@@ -23,14 +23,21 @@ def codeBuild(javaVersion,buildType,buildDir,buildShell){
                'null' : '/data/jdk1.8.0_201']
     def javaHome = jdkPath["$javaVersion"]
     if ("$javaVersion" == 'jdk11'){
-       sh  """
+       try {
+        sh  """
         export JAVA_HOME=${javaHome}
         export PATH=\$JAVA_HOME/bin:\$PATH
         java -version
         cd ${buildDir} && ${buildHome} ${buildShell}
         """
+       }catch (e){
+            currentBuild.description="代码构建失败!"
+            error '代码构建失败!'
+        }
+
     } else {
-        sh  """
+        try {
+            sh  """
             export JAVA_HOME=${javaHome}
             export BUILD_HOME=${buildHome}
             export PATH=\$JAVA_HOME/bin:\$BUILD_HOME/bin:\$PATH
@@ -38,6 +45,10 @@ def codeBuild(javaVersion,buildType,buildDir,buildShell){
             java -version
             cd ${buildDir} && ${buildShell}
             """
+        }catch (e){
+            currentBuild.description="代码构建失败!"
+            error '代码构建失败!'
+        }
     }
 }
 
