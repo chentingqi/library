@@ -1,11 +1,9 @@
 package org.devops
 
 //构建打包
-def codeBuild(buildshell){
-    if 
-}
 
-def Build(javaVersion,buildType,buildDir,buildShell){
+
+def codeBuild(javaVersion,buildType,buildDir,buildShell){
     if (buildType == 'maven'){
         buildHome = "/data/apache-maven-3.6.3"
     } else if (buildType == 'ant'){
