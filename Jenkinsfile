@@ -6,6 +6,7 @@ def tools = new org.devops.tools()
 def codePull = new org.devops.codePull()
 def codeScan = new org.devops.codeScan()
 def codeBuild = new org.devops.codeBuild()
+def deployService = new org.devops.deployService()
 
 
 //String workspace = "/data/jenkins_home/workspace"
@@ -29,7 +30,22 @@ pipeline {
         jdkversion = "jdk8"
         buildType = "maven"
         buildShell = "/data/apache-maven-3.6.3/bin/mvn clean package -Dmaven.test.skip=true"
+        DEV_IP = "192.168.10.83",
+        TEST_IP = "192.168.10.83",
+        UAT_IP = "192.168.10.83",
+        PROD_IP = "192.168.10.83",
+        DEPLOY_DIR = "/data/",
+        DEPLOY_COMMAND = "/data/",
+
     }
+    parameters {
+    choice(
+        description: '选择部署环境',
+        name: 'ENV',
+        choices: ['test','uat','prod','rollback']
+    )
+    }
+
 
     stages {
         //下载代码
@@ -61,7 +77,7 @@ pipeline {
         stage("Build"){
                     steps{
                         timeout(time:20, unit:"MINUTES"){
-                            script{ //填写运行代码
+                            script{
                                   print('应用打包')
                                   tools.PrintMes("应用打包",'green')
                                   codeBuild.codeBuild("${jdkversion}","${buildType}","$workspace","${buildShell}")
@@ -69,40 +85,26 @@ pipeline {
                         }
                     }
                 }
-
-        /*stage("01"){
-            failFast true
-            parallel {
-        
-                //构建
-                stage("Build"){
+        stage("deploy"){
                     steps{
                         timeout(time:20, unit:"MINUTES"){
-                            script{ //填写运行代码
-                                  print('应用打包')
-                                  tools.PrintMes("应用打包",'green')
-                                //mvnHome = tool "m2"
-                                //println(mvnHome)
-                                  sleep 3
-                                //sh "${mvnHome}/bin/mvn --version"
+                            script{ 
+                                  print('服务部署')
+                                  tools.PrintMes("服务部署",'green')
+                                  if (params.ENV == "dev") {
+                                      for (item in map.DEV_IP.tokenize(',')){
+                                          echo "deploy ${ENV}" 
+                                          echo "deploy ${item}"
+                                          deployService.deployService("salt","${JAR}","${item}","${JOB_NAME}","${DEPLOY_DIR}","${DEPLOY_COMMAND}",)
+                   
+                                       }
+                                  }
+
                             }
                         }
                     }
-                }
+        }
         
-                //代码扫描
-                stage("CodeScan"){
-                    steps{
-                        timeout(time:30, unit:"MINUTES"){
-                            script{
-                                print("代码扫描")
-                                tools.PrintMes("代码扫描",'green')
-                            }
-                        }
-                    }
-                }
-            }
-        }*/
     }
 
     //构建后操作
