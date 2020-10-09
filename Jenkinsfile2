@@ -2,6 +2,15 @@
 
 @Library('library-test') _
 
+def tools = new org.devops.tools()
+def codePull = new org.devops.codePull()
+def codeScan = new org.devops.codeScan()
+def codeBuild = new org.devops.codeBuild()
+def deployService = new org.devops.deployService()
+def logCheck = new org.devops.logCheck()
+def serviceCheck = new org.devops.serviceCheck()
+def nexusPush = new org.devops.nexusPush()
+
 devopsGit([
       node: "master",
       giturl: "https://git.youlu.com/yunwei-devops/sonar-ali.git",
