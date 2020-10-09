@@ -26,9 +26,6 @@ pipeline {
         giturl = "https://git.youlu.com/yunwei-devops/sonar-ali.git"
         gitbranch = "master"
         gitcert = "chenjingtao-git"
-        projectType = "java"
-        srcDir = ""
-        serviceName 
     }
 
     stages {
