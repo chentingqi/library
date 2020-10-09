@@ -10,7 +10,7 @@ def deployService = new org.devops.deployService()
 def logCheck = new org.devops.logCheck()
 def serviceCheck = new org.devops.serviceCheck()
 def nexusPush = new org.devops.nexusPush()
-
+def mailSend = new org.devops.mailSend()
 
 //String workspace = "/data/jenkins_home/workspace"
 
@@ -47,6 +47,7 @@ pipeline {
         NEXUS_NAME1 = "sonar-pmd-plugin"
         NEXUS_NAME2 = "2.6"
         NEXUS_NAME = "sonar-pmd-plugin"
+        EMAILLIST = "cjt@youlu.com"
 
     }
     parameters {
@@ -214,12 +215,14 @@ pipeline {
         success {
             script{
                 currentBuild.description = "\n 构建成功!" 
+                mailSend.mailSend("success","${EMAILLIST}")
             }
         }
 
         failure {
             script{
                 currentBuild.description = "\n 构建失败!" 
+                mailSend.mailSend("failure","${EMAILLIST}")
             }
         }
 
