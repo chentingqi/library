@@ -2,7 +2,7 @@ package org.devops
 
 
 //代码扫描
-def codeScan(projectType,skipSonar,srcDir,serviceName,scanDir){
+def codeScan(projectType,srcDir,serviceName){
     def scanHome = "/data/sonar-scanner"
     if (projectType == 'java'){
         try {
@@ -12,7 +12,7 @@ def codeScan(projectType,skipSonar,srcDir,serviceName,scanDir){
                 -Dsonar.sources=.  -Dsonar.language=java -Dsonar.sourceEncoding=UTF-8 \
                 -Dsonar.java.binaries=${serviceName} -Dsonar.java.coveragePlugin=jacoco \
                 -Dsonar.jacoco.reportPath=target/jacoco.exec -Dsonar.junit.reportsPath=target/surefire-reports \
-                -Dsonar.surefire.reportsPath=target/surefire-reports -Dsonar.projectDescription='devopsdevops'
+                -Dsonar.surefire.reportsPath=target/surefire-reports -Dsonar.projectDescription='devopsdevops' -Dsonar.host.url=http://192.168.10.83:9000
              """ 
         } catch (e){
             currentBuild.description="代码扫描失败!"
@@ -28,7 +28,7 @@ def codeScan(projectType,skipSonar,srcDir,serviceName,scanDir){
                 -Dsonar.sources=.  -Dsonar.language=c -Dsonar.sourceEncoding=UTF-8 \
                 -Dsonar.java.binaries=${serviceName} -Dsonar.java.coveragePlugin=jacoco \
                 -Dsonar.jacoco.reportPath=target/jacoco.exec -Dsonar.junit.reportsPath=target/surefire-reports \
-                -Dsonar.surefire.reportsPath=target/surefire-reports -Dsonar.projectDescription='devopsdevops'
+                -Dsonar.surefire.reportsPath=target/surefire-reports -Dsonar.projectDescription='devopsdevops' -Dsonar.host.url=http://192.168.10.83:9000
              """ 
         } catch (e){
             currentBuild.description="代码扫描失败!"
