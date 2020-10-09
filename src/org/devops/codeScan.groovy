@@ -8,9 +8,9 @@ def codeScan(projectType,srcDir,serviceName){
         try {
             sh """
                 cd ${srcDir} 
-                ${scanHome}/bin/sonar-scanner -X -Dsonar.projectName=${serviceName} -Dsonar.projectKey=${serviceName}  \
-                -Dsonar.sources=${srcDir}  -Dsonar.language=java -Dsonar.sourceEncoding=UTF-8 \
-                -Dsonar.java.binaries=${serviceName}  -Dsonar.host.url=http://192.168.10.83:9000
+                cp /data/build-devops/sonar-project.properties ${srcDir}
+                sed -i 's/jobname/${serviceName}/g' sonar-project.properties
+                ${scanHome}/bin/sonar-scanner -X -Dsonar.host.url=http://192.168.10.83:9000
              """ 
         } catch (e){
             currentBuild.description="代码扫描失败!"
