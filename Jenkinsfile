@@ -9,6 +9,8 @@ def codeBuild = new org.devops.codeBuild()
 def deployService = new org.devops.deployService()
 def logCheck = new org.devops.logCheck()
 def serviceCheck = new org.devops.serviceCheck()
+def nexusPush = new org.devops.nexusPush()
+
 
 //String workspace = "/data/jenkins_home/workspace"
 
@@ -40,6 +42,12 @@ pipeline {
         JAR = "target/sonar-pmd-plugin-2.6.jar"
         APP_LOG = "/data/app.log"
         SERVICE_NAME = "salt"
+        NEXUS_GROUP = "devops"
+        NEXUS_SEVICE = "sonar-pmd-plugin"
+        NEXUS_NAME1 = "sonar-pmd-plugin"
+        NEXUS_NAME2 = "2.6"
+        NEXUS_NAME = "sonar-pmd-plugin"
+
     }
     parameters {
     choice(
@@ -47,6 +55,18 @@ pipeline {
         name: 'ENV',
         choices: ['test','uat','prod','rollback']
     )
+    choice(
+      description: "V3.*X*是X迭代提测版本根目录,迭代从0起,例如 V3.0",
+      name: 'NEXUS_REP',
+      choices: ['youlu','V3.27','V3.28','V3.29','V3.30','V1.06','V1.07','V1.08','V1.09','V1.10','V1.11']
+     )
+     
+     choice(
+      description: "V3.*X*.*Y*是X迭代上线前研发多次提测版本，Y表示第几次提测，例如 V3.0.1表示V3的0迭代第1次提交;      P00*Z*是X迭代上线后研发多次提测补丁，Z表示第几次补丁， P001 表示V3的0迭代第1次补丁;         上线前提测从1起，上线后提测从1起",
+      name: 'NEXUS_PATCH',
+      choices: ['','001','002','003','004','005','006','007','008','009','010','011','012','013','014','015','016','017','P001','P002','P003','P004','P005','P006']
+     )
+
     }
 
 
@@ -172,7 +192,7 @@ pipeline {
                             script{
                                   print('制品上传')
                                   tools.PrintMes("制品上传",'green')
-                                  
+                                  nexusPush.nexusPush("jar","","","","","","")
                             }
                         }
                     }
