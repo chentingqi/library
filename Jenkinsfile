@@ -5,7 +5,7 @@
 def tools = new org.devops.tools()
 def codePull = new org.devops.codePull()
 def codeScan = new org.devops.codeScan()
-
+def codeBuild = new org.devops.codeBuild()
 
 
 //String workspace = "/data/jenkins_home/workspace"
@@ -26,6 +26,9 @@ pipeline {
         giturl = "https://git.youlu.com/yunwei-devops/sonar-ali.git"
         gitbranch = "master"
         gitcert = "chenjingtao-git"
+        jdkversion = "jdk8"
+        buildType = "maven"
+        buildShell = "/data/apache-maven-3.6.3/bin/mvn clean package -Dmaven.test.skip=true"
     }
 
     stages {
@@ -64,10 +67,7 @@ pipeline {
                             script{ //填写运行代码
                                   print('应用打包')
                                   tools.PrintMes("应用打包",'green')
-                                //mvnHome = tool "m2"
-                                //println(mvnHome)
-                                  sleep 3
-                                //sh "${mvnHome}/bin/mvn --version"
+                                  codeBuild.codeBuild("${jdkversion}","${buildType}","$workspace","${buildShell}")
                             }
                         }
                     }
