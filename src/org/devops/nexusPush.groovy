@@ -1,6 +1,6 @@
 package org.devops
 
-def nexusPush(packagetype,jar,nexusRep,nexusGroup,nexusPatch,nexusname1,nexusname2,nexusname){
+def nexusPush(packagetype,jar,nexusRep,nexusGroup,nexusPatch,nexusname1,nexusname2){
     try{
           sh """
             echo ${jar}
@@ -11,7 +11,7 @@ def nexusPush(packagetype,jar,nexusRep,nexusGroup,nexusPatch,nexusname1,nexusnam
             sed -i 's#patch#${nexusPatch}#g' nexus-upload.sh
             sed -i 's/one/${nexusname1}/g' nexus-upload.sh
             sed -i 's/two/${nexusname2}/g' nexus-upload.sh
-            sed -i 's/id/${nexusname}/g' nexus-upload.sh
+            sed -i 's/id/${nexusname1}-${nexusname2}/g' nexus-upload.sh
             sed -i 's/type/${packagetype}/g' nexus-upload.sh
             sh nexus-upload.sh
              """
@@ -32,7 +32,7 @@ def nexusPushTime(packagetype,jar,nexusRep,nexusGroup,nexusPatch,nexusname1,nexu
             sed -i 's#patch#${nexusPatch}#g' nexus-upload-time.sh
             sed -i 's/one/${nexusname1}/g' nexus-upload-time.sh
             sed -i 's/two/${nexusname2}/g' nexus-upload-time.sh
-            sed -i 's/id/${nexusname}/g' nexus-upload-time.sh
+            sed -i 's/id/${nexusname1}-${nexusname2}/g' nexus-upload-time.sh
             sed -i 's/type/${packagetype}/g' nexus-upload-time.sh
             sh nexus-upload-time.sh
              """
