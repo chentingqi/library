@@ -92,7 +92,7 @@ pipeline {
                                   print('服务部署')
                                   tools.PrintMes("服务部署",'green')
                                   if (params.ENV == "test") {
-                                      for (item in map.TEST_IP.tokenize(',')){
+                                      for (item in TEST_IP.tokenize(',')){
                                           echo "deploy ${ENV}" 
                                           echo "deploy ${item}"
                                           deployService.deployService("salt","${JAR}","${item}","${JOB_NAME}","${DEPLOY_DIR}","${DEPLOY_COMMAND}",)
