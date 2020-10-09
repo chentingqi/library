@@ -5,6 +5,7 @@
 def tools = new org.devops.tools()
 def codePull = new org.devops.codePull()
 def codeScan = new org.devops.codeScan()
+def unitTest = new org.devops.unitTest()
 def codeBuild = new org.devops.codeBuild()
 def deployService = new org.devops.deployService()
 def logCheck = new org.devops.logCheck()
@@ -94,6 +95,17 @@ pipeline {
                                 print("代码扫描")
                                 tools.PrintMes("代码扫描",'green')
                                 codeScan.codeScan("java","$workspace","${JOB_NAME}")
+                            }
+                        }
+                    }
+                }
+        stage("unitTest"){
+                    steps{
+                        timeout(time:30, unit:"MINUTES"){
+                            script{
+                                print("单元测试")
+                                tools.PrintMes("单元测试",'green')
+                                unitTest.unitTest()
                             }
                         }
                     }
@@ -215,14 +227,12 @@ pipeline {
         success {
             script{
                 currentBuild.description = "\n 构建成功!" 
-                mailSend.mailSend("success","${EMAILLIST}")
             }
         }
 
         failure {
             script{
                 currentBuild.description = "\n 构建失败!" 
-                mailSend.mailSend("failure","${EMAILLIST}")
             }
         }
 
