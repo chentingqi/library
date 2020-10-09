@@ -7,8 +7,8 @@ devopsGit([
       giturl: "https://git.youlu.com/yunwei-devops/sonar-ali.git",
       gitbranch: "master",
       gitcert: "chenjingtao-git",
-      jdkversion = "jdk8"
-      buildType = "maven"
+      jdkversion: "jdk8"
+      buildType: "maven"
       buildShell: "/data/apache-maven-3.6.3/bin/mvn clean package -Dmaven.test.skip=true",
       JAR: "target/sonar-pmd-plugin-2.6.jar",
       JAR_NAME: "sonar-pmd-plugin-2.6.jar",
