@@ -4,6 +4,7 @@
 
 def tools = new org.devops.tools()
 def codePull = new org.devops.codePull()
+def codeScan = new org.devops.codeScan()
 
 
 
@@ -25,6 +26,9 @@ pipeline {
         giturl = "https://git.youlu.com/yunwei-devops/sonar-ali.git"
         gitbranch = "master"
         gitcert = "chenjingtao-git"
+        projectType = "java"
+        srcDir = ""
+        serviceName 
     }
 
     stages {
@@ -52,6 +56,7 @@ pipeline {
                             script{
                                 print("代码扫描")
                                 tools.PrintMes("代码扫描",'green')
+                                codeScan.codeScan(java,"$workspace","${JOB_NAME}")
                             }
                         }
                     }
