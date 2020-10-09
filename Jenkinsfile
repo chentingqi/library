@@ -41,9 +41,6 @@ pipeline {
                         tools.PrintMes("获取代码",'green')
                         echo "origin：${giturl}   branch: ${gitbranch},  凭据：${gitcert}"
                         codePull.gitPull("${giturl}","${gitbranch}","${gitcert}")
-                        sleep 3
-                        
-                        //input id: 'Test', message: '我们是否要继续？', ok: '是，继续吧！', parameters: [choice(choices: ['a', 'b'], description: '', name: 'test1')], submitter: 'lizeyang,admin'
                     }
                 
                 }
