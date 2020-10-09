@@ -1,5 +1,3 @@
-// devopsGit.groovy
-
 #!groovy
 
 @Library('library-test') _
