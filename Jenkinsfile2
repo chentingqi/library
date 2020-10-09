@@ -1,0 +1,30 @@
+#!groovy
+
+@Library('library-test') _
+
+devopsGit([
+      node: "master",
+      git_url: "https://git.youlu.com/yunwei-devops/sonar-ali.git",
+      git_cert: "chenjingtao-git",
+      jdkversion = "jdk8"
+      buildType = "maven"
+      buildShell: "/data/apache-maven-3.6.3/bin/mvn clean package -Dmaven.test.skip=true",
+      JAR: "target/sonar-pmd-plugin-2.6.jar",
+      JAR_NAME: "sonar-pmd-plugin-2.6.jar",
+      DEV_IP: "192.168.10.83",
+      TEST_IP: "192.168.10.83",
+      UAT_IP: "192.168.10.83",
+      PROD_IP: "192.168.10.83",
+      DEPLOY_DIR: "/data/deploy_service.sh",
+      DEPLOY_COMMAND: "deploy_sonarali",
+      APP_LOG: "/data/app.log",
+      SERVICE_NAME: "salt",
+      NEXUS_GROUP: "devops",
+      NEXUS_SEVICE: "sonar-pmd-plugin",
+      NEXUS_NAME1:"sonar-pmd-plugin",
+      NEXUS_NAME2:"2.6",
+      NEXUS_NAME: "sonar-pmd-plugin",
+      BOOK: "changelist.txt",
+      API_HOST: "http://",
+      EMAILLIST: "cjt@youlu.com" 
+      ])
