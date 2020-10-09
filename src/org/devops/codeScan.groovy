@@ -8,7 +8,7 @@ def codeScan(projectType,srcDir,serviceName){
         try {
             sh """
                 cd ${srcDir} 
-                ${scanHome}/bin/sonar-scanner -Dsonar.projectName=${serviceName} -Dsonar.projectKey=${serviceName}  \
+                ${scanHome}/bin/sonar-scanner -X -Dsonar.projectName=${serviceName} -Dsonar.projectKey=${serviceName}  \
                 -Dsonar.sources=.  -Dsonar.language=java -Dsonar.sourceEncoding=UTF-8 \
                 -Dsonar.java.binaries=${serviceName} -Dsonar.java.coveragePlugin=jacoco \
                 -Dsonar.jacoco.reportPath=target/jacoco.exec -Dsonar.junit.reportsPath=target/surefire-reports \
@@ -24,7 +24,7 @@ def codeScan(projectType,srcDir,serviceName){
         try {
             sh """
                 cd ${srcDir} 
-                ${scanHome}/bin/sonar-scanner -Dsonar.projectName=${serviceName} -Dsonar.projectKey=${serviceName}  \
+                ${scanHome}/bin/sonar-scanner -X -Dsonar.projectName=${serviceName} -Dsonar.projectKey=${serviceName}  \
                 -Dsonar.sources=.  -Dsonar.language=c -Dsonar.sourceEncoding=UTF-8 \
                 -Dsonar.java.binaries=${serviceName} -Dsonar.java.coveragePlugin=jacoco \
                 -Dsonar.jacoco.reportPath=target/jacoco.exec -Dsonar.junit.reportsPath=target/surefire-reports \
