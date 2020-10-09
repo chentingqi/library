@@ -27,7 +27,7 @@ def nexusTime(packagetype,jar,nexusRep,nexusGroup,nexusPatch,nexusname1,nexusnam
             echo ${jar}
             cp /data/build-devops/nexus-common/nexus-upload-time.sh $workspace
             sed -i 's#name#${jar}#g' nexus-upload-time.sh
-            sed -i 's#book#${book}#g' nexus-upload-time2.sh
+            sed -i 's#book#${book}#g' nexus-upload-time.sh
             sed -i 's#cangku#${nexusRep}#g' nexus-upload-time.sh
             sed -i 's#group#${nexusGroup}#g' nexus-upload-time.sh
             sed -i 's#patch#${nexusPatch}#g' nexus-upload-time.sh
