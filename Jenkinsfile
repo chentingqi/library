@@ -53,7 +53,7 @@ pipeline {
                             script{
                                 print("代码扫描")
                                 tools.PrintMes("代码扫描",'green')
-                                codeScan.codeScan(java,"$workspace","${JOB_NAME}")
+                                codeScan.codeScan("java","$workspace","${JOB_NAME}")
                             }
                         }
                     }
