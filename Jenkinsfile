@@ -11,7 +11,7 @@ def deployService = new org.devops.deployService()
 def logCheck = new org.devops.logCheck()
 def serviceCheck = new org.devops.serviceCheck()
 def nexusPush = new org.devops.nexusPush()
-def mailSend = new org.devops.mailSend()
+//def mailSend = new org.devops.mailSend()
 
 //String workspace = "/data/jenkins_home/workspace"
 
