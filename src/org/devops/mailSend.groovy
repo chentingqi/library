@@ -3,6 +3,7 @@ package org.devops
 def mailSend(status,maillist){
     if (status == 'success'){
        try {
+          """
           emailext attachLog: true, attachmentsPattern: 'target/cucumber.html', 
           subject: "'${ENV}环境：${env.JOB_NAME} [${env.BUILD_NUMBER}]' 构建成功",
 		  body: """
@@ -20,10 +21,12 @@ def mailSend(status,maillist){
           </ul>
           </div>
           </div>""",mimeType: 'text/html',to : "${maillist}",from: "cjt@youlu.com"
+          """
         }
     }
     if (status == 'failure'){
        try {
+          """
           emailext attachLog: true, attachmentsPattern: 'target/cucumber.html', 
           subject: "'${ENV}环境：${env.JOB_NAME} [${env.BUILD_NUMBER}]' 构建失败",
 		  body: """
@@ -41,6 +44,7 @@ def mailSend(status,maillist){
           </ul>
           </div>
           </div>""",mimeType: 'text/html',to : "${maillist}",from: "cjt@youlu.com"
+          """
         }
     }
     
