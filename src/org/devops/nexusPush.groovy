@@ -3,7 +3,7 @@ package org.devops
 def nexusPush(packagetype,jar,nexusRep,nexusGroup,nexusPatch,nexusname1,nexusname2,nexusname){
     try{
           sh """
-            echo ${jar}"
+            echo ${jar}
             cp /data/build-devops/nexus-common/nexus-upload.sh $workspace
             sed -i 's#name#${jar}#g' nexus-upload.sh
             sed -i 's#cangku#${nexusRep}#g' nexus-upload.sh
