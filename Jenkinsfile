@@ -30,12 +30,12 @@ pipeline {
         jdkversion = "jdk8"
         buildType = "maven"
         buildShell = "/data/apache-maven-3.6.3/bin/mvn clean package -Dmaven.test.skip=true"
-        DEV_IP = "192.168.10.83",
-        TEST_IP = "192.168.10.83",
-        UAT_IP = "192.168.10.83",
-        PROD_IP = "192.168.10.83",
-        DEPLOY_DIR = "/data/",
-        DEPLOY_COMMAND = "/data/",
+        DEV_IP = "192.168.10.83"
+        TEST_IP = "192.168.10.83"
+        UAT_IP = "192.168.10.83"
+        PROD_IP = "192.168.10.83"
+        DEPLOY_DIR = "/data/"
+        DEPLOY_COMMAND = "/data/"
 
     }
     parameters {
