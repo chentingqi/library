@@ -4,7 +4,7 @@ def unitTest(){
     try{
        sh """
           export MAVEN_HOME=/data/apache-maven-3.6.3
-          export PATH=\MAVEN_HOME/bin:\$PATH
+          export PATH=\$MAVEN_HOME/bin:\$PATH
           mvn test
        """
     }catch (e){
