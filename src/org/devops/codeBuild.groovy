@@ -18,7 +18,7 @@ def codeBuild(javaVersion,buildType,buildDir,buildShell){
     //选择JDK版本
     jdkPath = ['jdk7' : '/data/jdk1.7.0_79',
                'jdk6' : '/data/jdk1.6.0_45',
-               'jdk8' : '/data/jdk1.8.0_201',
+               'jdk8' : '/data/jdk1.8.0_191',
                'jdk11': '/data/jdk-11.0.1',
                'null' : '/data/jdk1.8.0_201']
     def javaHome = jdkPath["$javaVersion"]
