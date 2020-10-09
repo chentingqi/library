@@ -21,7 +21,7 @@ def nexusPush(packagetype,jar,nexusRep,nexusGroup,nexusPatch,nexusname1,nexusnam
         }
 }
 
-def nexusPushTime(packagetype,jar,nexusRep,nexusGroup,nexusPatch,nexusname1,nexusname2){
+def nexusTime(packagetype,jar,nexusRep,nexusGroup,nexusPatch,nexusname1,nexusname2){
     try{
           sh """
             echo ${jar}
