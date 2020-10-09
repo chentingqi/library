@@ -207,7 +207,7 @@ pipeline {
                                   print('制品上传')
                                   tools.PrintMes("制品上传",'green')
                                   if (params.ENV == 'test'){
-                                  nexusPush.nexusPush("jar","${JAR}","${NEXUS_REP}","${NEXUS_GROUP}","${NEXUS_PATCH}","${NEXUS_NAME1}","${NEXUS_NAME2}")
+                                  nexusPush.nexusTime("jar","${JAR}","${NEXUS_REP}","${NEXUS_GROUP}","${NEXUS_PATCH}","${NEXUS_NAME1}","${NEXUS_NAME2}")
                                   }
                             }
                         }
