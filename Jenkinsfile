@@ -219,7 +219,7 @@ pipeline {
                         timeout(time:20, unit:"MINUTES"){
                             script{
                                   print('恢复节点')
-                                  tools.PrintMes("恢复节点$172.16.106.59",'green')
+                                  tools.PrintMes("恢复节点172.16.106.59",'green')
                                   changeSlb.mountSlb("${172.16.106.59}")
                             }
                         }
