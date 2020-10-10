@@ -131,7 +131,7 @@ pipeline {
                                   print('卸载节点')
                                   tools.PrintMes("卸载节点${TEST_IP}",'green')
                                   changeSlb.umountSlb("${TEST_IP}")
-                                  sleep 30s
+                                  sleep 30
                             }
                         }
                     }
