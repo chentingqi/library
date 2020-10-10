@@ -1,7 +1,7 @@
 package org.devops
 
 def umountSlb(nodeip){
-    if (nodeip == '192.168.10.83'){
+    if (nodeip == '172.16.106.59'){
        try{
            sh """
               python /data/SLB/aliyun-python-sdk-slb-3.2.18/cjt/RemoveVServerGroupBackendServers-80-59.py
@@ -24,7 +24,7 @@ def umountSlb(nodeip){
 }
 
 def mountSlb(nodeip){
-    if (nodeip == '192.168.10.83'){
+    if (nodeip == '172.16.106.59'){
        try{
            sh """
               python /data/SLB/aliyun-python-sdk-slb-3.2.18/cjt/AddVServerGroupBackendServers-80-59.py
