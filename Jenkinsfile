@@ -224,8 +224,7 @@ pipeline {
             script{
                 println("always")
             }
-            emailext 
-        body: '''
+            emailext body: '''
         <!DOCTYPE html>
         <html>
         <head>
