@@ -7,6 +7,7 @@ def codePull = new org.devops.codePull()
 def codeScan = new org.devops.codeScan()
 def unitTest = new org.devops.unitTest()
 def codeBuild = new org.devops.codeBuild()
+def changeSlb = new org.devops.changeSlb()
 def deployService = new org.devops.deployService()
 def logCheck = new org.devops.logCheck()
 def serviceCheck = new org.devops.serviceCheck()
@@ -123,6 +124,17 @@ pipeline {
                         }
                     }
                 }
+        stage("umount ${TEST_IP}"){
+                    steps{
+                        timeout(time:20, unit:"MINUTES"){
+                            script{
+                                  print('卸载节点')
+                                  tools.PrintMes("卸载节点${TEST_IP}",'green')
+                                  changeSlb.umountSlb("${TEST_IP}")
+                            }
+                        }
+                    }
+                }
         stage("deploy"){
                     steps{
                         timeout(time:20, unit:"MINUTES"){
@@ -201,6 +213,17 @@ pipeline {
                         }
                     }
         }
+        stage("mount ${TEST_IP}"){
+                    steps{
+                        timeout(time:20, unit:"MINUTES"){
+                            script{
+                                  print('恢复节点')
+                                  tools.PrintMes("恢复节点${TEST_IP}",'green')
+                                  changeSlb.mountSlb("${TEST_IP}")
+                            }
+                        }
+                    }
+                }
         stage("nexus_push"){
                     steps{
                         timeout(time:20, unit:"MINUTES"){
