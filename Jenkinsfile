@@ -124,19 +124,19 @@ pipeline {
                         }
                     }
                 }
-        stage("umount node1"){
+        stage("umount 59"){
                     steps{
                         timeout(time:20, unit:"MINUTES"){
                             script{
                                   print('卸载节点')
-                                  tools.PrintMes("卸载节点${TEST_IP}",'green')
-                                  changeSlb.umountSlb("${TEST_IP}")
+                                  tools.PrintMes("卸载节点172.16.106.59",'green')
+                                  changeSlb.umountSlb("172.16.106.59")
                                   sleep 30
                             }
                         }
                     }
                 }
-        stage("deploy"){
+        stage("deploy59"){
                     steps{
                         timeout(time:20, unit:"MINUTES"){
                             script{ 
@@ -214,13 +214,114 @@ pipeline {
                         }
                     }
         }
-        stage("mount node1"){
+        stage("mount 59"){
                     steps{
                         timeout(time:20, unit:"MINUTES"){
                             script{
                                   print('恢复节点')
-                                  tools.PrintMes("恢复节点${TEST_IP}",'green')
-                                  changeSlb.mountSlb("${TEST_IP}")
+                                  tools.PrintMes("恢复节点$172.16.106.59",'green')
+                                  changeSlb.mountSlb("${172.16.106.59}")
+                            }
+                        }
+                    }
+                }
+        stage("umount 65"){
+                    steps{
+                        timeout(time:20, unit:"MINUTES"){
+                            script{
+                                  print('卸载节点')
+                                  tools.PrintMes("卸载节点172.16.106.65",'green')
+                                  changeSlb.umountSlb("172.16.106.65")
+                                  sleep 30
+                            }
+                        }
+                    }
+                }
+        stage("deploy65"){
+                    steps{
+                        timeout(time:20, unit:"MINUTES"){
+                            script{ 
+                                  print('服务部署')
+                                  tools.PrintMes("服务部署",'green')
+                                  if (params.ENV == "test") {
+                                      for (item in TEST_IP.tokenize(',')){
+                                          echo "deploy ${ENV}" 
+                                          echo "deploy ${item}"
+                                          deployService.deployService("salt","${JAR}","${item}","${JOB_NAME}","${DEPLOY_DIR}","${DEPLOY_COMMAND}",)
+                   
+                                       }
+                                  }
+                                  if (params.ENV == "uat") {
+                                      for (item in UAT_IP.tokenize(',')){
+                                          echo "deploy ${ENV}" 
+                                          echo "deploy ${item}"
+                                          deployService.deployService("salt","${JAR}","${item}","${JOB_NAME}","${DEPLOY_DIR}","${DEPLOY_COMMAND}",)
+                   
+                                       }
+                                  }
+                                  if (params.ENV == "prod") {
+                                      for (item in PROD_IP.tokenize(',')){
+                                          echo "deploy ${ENV}" 
+                                          echo "deploy ${item}"
+                                          deployService.deployService("salt","${JAR}","${item}","${JOB_NAME}","${DEPLOY_DIR}","${DEPLOY_COMMAND}",)
+                   
+                                       }
+                                  }
+                                  if (params.ENV == "roleback") {
+                                      for (item in PROD_IP.tokenize(',')){
+                                          echo "deploy ${ENV}" 
+                                          echo "deploy ${item}"
+                                          deployService.deployService("salt","${JAR}","${item}","${JOB_NAME}","${DEPLOY_DIR}","${DEPLOY_COMMAND}",)
+                   
+                                       }
+                                  }
+
+                            }
+                        }
+                    }
+        }
+        stage("log_check"){
+                    steps{
+                        timeout(time:20, unit:"MINUTES"){
+                            script{
+                                  print('日志检查')
+                                  tools.PrintMes("日志检查",'green')
+                                   if (params.ENV == "test") {
+                                      for (item in TEST_IP.tokenize(',')){
+                                          echo "回显节点${item}服务最后100行日志" 
+                                          logCheck.logCheck("salt","${item}","${JOB_NAME}","${APP_LOG}")
+                   
+                                       }
+                                  }
+                                  
+                            }
+                        }
+                    }
+        }
+        stage("service_check"){
+                    steps{
+                        timeout(time:20, unit:"MINUTES"){
+                            script{
+                                  print('服务检查')
+                                  tools.PrintMes("服务检查",'green')
+                                  if (params.ENV == "test") {
+                                      for (item in TEST_IP.tokenize(',')){
+                                          echo "检查节点服务状态" 
+                                          serviceCheck.serviceCheck("salt","${item}","${JOB_NAME}","${SERVICE_NAME}")
+                   
+                                       }
+                                  }
+                            }
+                        }
+                    }
+        }
+        stage("mount 65"){
+                    steps{
+                        timeout(time:20, unit:"MINUTES"){
+                            script{
+                                  print('恢复节点')
+                                  tools.PrintMes("恢复节点172.16.106.65",'green')
+                                  changeSlb.mountSlb("${172.16.106.65}")
                             }
                         }
                     }
