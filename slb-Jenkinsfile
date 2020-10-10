@@ -2,21 +2,10 @@
 
 @Library('library-test') _
 
-def tools = new org.devops.tools()
-def codePull = new org.devops.codePull()
-def codeScan = new org.devops.codeScan()
-def unitTest = new org.devops.unitTest()
-def codeBuild = new org.devops.codeBuild()
+
 def changeSlb = new org.devops.changeSlb()
-def deployService = new org.devops.deployService()
-def logCheck = new org.devops.logCheck()
-def serviceCheck = new org.devops.serviceCheck()
-def nexusPush = new org.devops.nexusPush()
-//def mailSend = new org.devops.mailSend()
 
-//String workspace = "/data/jenkins_home/workspace"
 
-//Pipeline
 pipeline {
     agent { node {  label "master"   //指定运行节点的标签或者名称
             }
@@ -28,31 +17,6 @@ pipeline {
         disableConcurrentBuilds() //禁止并行
         buildDiscarder(logRotator(numToKeepStr: '5')) 
         timeout(time: 1, unit: 'HOURS')  //流水线超时设置1h
-    }
-    environment {
-        giturl = "https://git.youlu.com/yunwei-devops/sonar-ali.git"
-        gitbranch = "master"
-        gitcert = "chenjingtao-git"
-        jdkversion = "jdk8"
-        buildType = "maven"
-        buildShell = "/data/apache-maven-3.6.3/bin/mvn clean package -Dmaven.test.skip=true"
-        DEV_IP = "192.168.10.83"
-        TEST_IP = "192.168.10.83"
-        UAT_IP = "192.168.10.83"
-        PROD_IP = "192.168.10.83"
-        DEPLOY_DIR = "/data/"
-        DEPLOY_COMMAND = "/data/deploy_service.sh"
-        JAR = "target/sonar-pmd-plugin-2.6.jar"
-        APP_LOG = "/data/app.log"
-        SERVICE_NAME = "salt"
-        NEXUS_GROUP = "devops"
-        NEXUS_SEVICE = "sonar-pmd-plugin"
-        NEXUS_NAME1 = "sonar-pmd-plugin"
-        NEXUS_NAME2 = "2.6"
-        NEXUS_NAME = "sonar-pmd-plugin"
-        BOOK = "changelist.txt"
-        EMAILLIST = "cjt@youlu.com"
-
     }
     stages {
         stage("umount 59"){
