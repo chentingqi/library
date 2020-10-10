@@ -124,7 +124,7 @@ pipeline {
                         }
                     }
                 }
-        stage("umount ${TEST_IP}"){
+        stage("umount node1"){
                     steps{
                         timeout(time:20, unit:"MINUTES"){
                             script{
@@ -213,7 +213,7 @@ pipeline {
                         }
                     }
         }
-        stage("mount ${TEST_IP}"){
+        stage("mount node1"){
                     steps{
                         timeout(time:20, unit:"MINUTES"){
                             script{
