@@ -220,7 +220,7 @@ pipeline {
                             script{
                                   print('恢复节点')
                                   tools.PrintMes("恢复节点172.16.106.59",'green')
-                                  changeSlb.mountSlb("${172.16.106.59}")
+                                  changeSlb.mountSlb("172.16.106.59")
                             }
                         }
                     }
@@ -321,7 +321,7 @@ pipeline {
                             script{
                                   print('恢复节点')
                                   tools.PrintMes("恢复节点172.16.106.65",'green')
-                                  changeSlb.mountSlb("${172.16.106.65}")
+                                  changeSlb.mountSlb("172.16.106.65")
                             }
                         }
                     }
