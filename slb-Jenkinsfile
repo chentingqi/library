@@ -26,7 +26,7 @@ pipeline {
                                   print('卸载节点')
                                   tools.PrintMes("卸载节点172.16.106.59",'green')
                                   changeSlb.umountSlb("172.16.106.59")
-                                  sleep 30
+                                  
                             }
                         }
                     }
@@ -51,7 +51,6 @@ pipeline {
                                   print('卸载节点')
                                   tools.PrintMes("卸载节点172.16.106.65",'green')
                                   changeSlb.umountSlb("172.16.106.65")
-                                  sleep 30
                             }
                         }
                     }
