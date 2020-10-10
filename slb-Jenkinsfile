@@ -7,16 +7,14 @@ def changeSlb = new org.devops.changeSlb()
 
 
 pipeline {
-    agent { node {  label "master"   //指定运行节点的标签或者名称
-            }
-    }
+    agent { node {  label "master"}}
 
     options {
-        timestamps()  //日志会有时间
-        skipDefaultCheckout()  //删除隐式checkout scm语句
-        disableConcurrentBuilds() //禁止并行
+        timestamps()
+        skipDefaultCheckout()
+        disableConcurrentBuilds()
         buildDiscarder(logRotator(numToKeepStr: '5')) 
-        timeout(time: 1, unit: 'HOURS')  //流水线超时设置1h
+        timeout(time: 1, unit: 'HOURS')
     }
     stages {
         stage("umount 59"){
@@ -57,6 +55,7 @@ pipeline {
                 }
         stage("mount 65"){
                     steps{
+                        input id: '2', message: '是否恢复节点172.16.106.65', ok: '确定'
                         timeout(time:20, unit:"MINUTES"){
                             script{
                                   print('恢复节点')
