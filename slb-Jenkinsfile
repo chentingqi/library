@@ -2,7 +2,7 @@
 
 @Library('library-test') _
 
-
+def tools = new org.devops.tools()
 def changeSlb = new org.devops.changeSlb()
 
 
