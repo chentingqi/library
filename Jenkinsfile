@@ -179,7 +179,7 @@ pipeline {
                         }
                     }
         }
-        stage("log_check"){
+        stage("log_check59"){
                     steps{
                         timeout(time:20, unit:"MINUTES"){
                             script{
@@ -197,7 +197,7 @@ pipeline {
                         }
                     }
         }
-        stage("service_check"){
+        stage("service_check59"){
                     steps{
                         timeout(time:20, unit:"MINUTES"){
                             script{
@@ -280,7 +280,7 @@ pipeline {
                         }
                     }
         }
-        stage("log_check"){
+        stage("log_check65"){
                     steps{
                         timeout(time:20, unit:"MINUTES"){
                             script{
@@ -298,7 +298,7 @@ pipeline {
                         }
                     }
         }
-        stage("service_check"){
+        stage("service_check65"){
                     steps{
                         timeout(time:20, unit:"MINUTES"){
                             script{
