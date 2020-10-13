@@ -10,7 +10,7 @@ def codeScan(projectType,srcDir,serviceName){
                 cd ${srcDir} 
                 cp /data/build-devops/sonar-project.properties ${srcDir}
                 sed -i 's/jobname/${serviceName}/g' sonar-project.properties
-                ${scanHome}/bin/sonar-scanner -X -Dsonar.host.url=http://192.168.10.83:9000
+                ${scanHome}/bin/sonar-scanner -X -Dsonar.scm.disabled=true -Dsonar.host.url=http://192.168.10.83:9000
              """ 
         } catch (e){
             currentBuild.description="代码扫描失败!"
@@ -25,7 +25,7 @@ def codeScan(projectType,srcDir,serviceName){
                 cp /data/build-devops/sonar-project.properties ${srcDir}
                 sed -i 's/jobname/${serviceName}/g' sonar-project.properties
                 sed -i 's/sonar.language=java/sonar.language=c/g' sonar-project.properties
-                ${scanHome}/bin/sonar-scanner -X -Dsonar.host.url=http://192.168.10.83:9000
+                ${scanHome}/bin/sonar-scanner -X -Dsonar.scm.disabled=true -Dsonar.host.url=http://192.168.10.83:9000
              """ 
         } catch (e){
             currentBuild.description="代码扫描失败!"
@@ -40,7 +40,7 @@ def codeScan(projectType,srcDir,serviceName){
                 cp /data/build-devops/sonar-project.properties ${srcDir}
                 sed -i 's/jobname/${serviceName}/g' sonar-project.properties
                 sed -i 's/sonar.language=java/sonar.language=js/g' sonar-project.properties
-                ${scanHome}/bin/sonar-scanner -X -Dsonar.host.url=http://192.168.10.83:9000  
+                ${scanHome}/bin/sonar-scanner -X -Dsonar.scm.disabled=true -Dsonar.host.url=http://192.168.10.83:9000  
                 cd - 
                 """
         } catch (e){
