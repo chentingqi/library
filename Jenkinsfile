@@ -1,6 +1,6 @@
 #!groovy
 
-@Library('library-test') _
+@Library('library') _
 
 def tools = new org.devops.tools()
 def codePull = new org.devops.codePull()
