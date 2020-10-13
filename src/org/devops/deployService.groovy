@@ -5,7 +5,7 @@ def deployService(deploytype,deploypackage,deployip,srcdir,deploydir,deployshell
        try{
           sh """
              scp ${deploypackage} ${deployip}:/${deploydir}
-             ssh -p 22 ${deployip} 'sh ${deployshell}'
+             ssh -p 22 ${deployip} '${deployshell}'
              """
        }catch (e){
             currentBuild.description="服务部署失败!"
@@ -16,7 +16,7 @@ def deployService(deploytype,deploypackage,deployip,srcdir,deploydir,deployshell
        try{
           sh """
              salt ${deployip} cp.get_file salt://${srcdir}/${deploypackage} ${deploydir}
-             salt ${deployip} cmd.run 'sh ${deployshell}'
+             salt ${deployip} cmd.run '${deployshell}'
              """
        }catch (e){
             currentBuild.description="服务部署失败!"
