@@ -21,7 +21,7 @@ def uploadSvn(appversion,nexusname,apppackage){
             ## 创建版本
             mkdir -pv ${appversion}
             ## 进入版本
-            cd ${APP_VERSION}
+            cd ${appversion}
 
             ## 查询是否有重复的项目
             svn up ${nexusname} --username=chenjingtao --password=cjt#2020
