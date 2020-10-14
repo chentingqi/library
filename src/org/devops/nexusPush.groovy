@@ -63,3 +63,23 @@ def nexusTimeBook(packagetype,apppackage,nexusRep,nexusGroup,nexusPatch,nexusnam
             error '制品上传失败!'
         }
 }
+
+def nexusStable(packagetype,apppackage,nexusRep,version,nexusGroup,nexusname1,nexusname2){
+    try{
+          sh """
+            echo ${apppackage}
+            cp /data/build-devops/nexus-common/nexus-upload-stable.sh $workspace
+            sed -i 's#name#${apppackage}#g' nexus-upload-stable.sh
+            sed -i 's#cangku#${nexusRep}#g' nexus-upload-stable.sh
+            sed -i 's#deployversion#${version}#g' nexus-upload-stable.sh
+            sed -i 's#group#${nexusGroup}#g' nexus-upload-stable.sh
+            sed -i 's/one/${nexusname1}/g' nexus-upload-stable.sh
+            sed -i 's/two/${nexusname2}/g' nexus-upload-stable.sh
+            sed -i 's/type/${packagetype}/g' nexus-upload-stable.sh
+            sh nexus-upload-stable.sh
+             """
+       }catch (e){
+            currentBuild.description="制品上传失败!"
+            error '制品上传失败!'
+        }
+}
