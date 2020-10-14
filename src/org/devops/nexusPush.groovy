@@ -21,13 +21,14 @@ def nexusPush(packagetype,apppackage,nexusRep,nexusGroup,nexusPatch,nexusname1,n
         }
 }
 
-def nexusTime(packagetype,apppackage,nexusRep,nexusGroup,nexusname1,nexusname2){
+def nexusTime(packagetype,apppackage,nexusRep,version,nexusGroup,nexusname1,nexusname2){
     try{
           sh """
             echo ${apppackage}
             cp /data/build-devops/nexus-common/nexus-upload-time.sh $workspace
             sed -i 's#name#${apppackage}#g' nexus-upload-time.sh
             sed -i 's#cangku#${nexusRep}#g' nexus-upload-time.sh
+            sed -i 's#deployversion#${version}#g' nexus-upload-time.sh
             sed -i 's#group#${nexusGroup}#g' nexus-upload-time.sh
             sed -i 's/one/${nexusname1}/g' nexus-upload-time.sh
             sed -i 's/two/${nexusname2}/g' nexus-upload-time.sh
