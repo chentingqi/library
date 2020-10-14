@@ -15,7 +15,7 @@ def deployService(deploytype,deploypackage,deployip,srcdir,deploydir,deployshell
     if (deploytype == 'salt'){
        try{
           sh """
-             salt ${deployip} cp.get_file salt://${srcdir}/${deploypackage} ${deploydir}
+             salt ${deployip} cp.get_file salt://${srcdir}/${deploypackage} ${deploydir}/${deploypackage}
              salt ${deployip} cmd.run '${deployshell}'
              """
        }catch (e){
