@@ -1,6 +1,6 @@
 package org.devops
 
-def uploadSvn(appversion,nexusname,apppackage){
+def uploadSvn(appversion,apppatch,nexusname,apppackage){
     try{
           sh """
             echo ${apppackage}
@@ -16,12 +16,12 @@ def uploadSvn(appversion,nexusname,apppackage){
             cd MicroService
 
             ## 查询是否有重复的版本
-            svn up --set-depth=immediates ${appversion} --username=chenjingtao --password=cjt#2020
+            svn up --set-depth=immediates ${appversion}/${apppatch} --username=chenjingtao --password=cjt#2020
 
             ## 创建版本
-            mkdir -pv ${appversion}
+            mkdir -pv ${appversion}/${apppatch}
             ## 进入版本
-            cd ${appversion}
+            cd ${appversion}/${apppatch}
 
             ## 查询是否有重复的项目
             svn up ${nexusname} --username=chenjingtao --password=cjt#2020
@@ -37,7 +37,7 @@ def uploadSvn(appversion,nexusname,apppackage){
             cd ../
             # 添加所有文件
             svn add . --no-ignore --force
-            svn commit -m "Update ${nexusname} TO '${appversion}'" --username=chenjingtao --password=cjt#2020
+            svn commit -m "Update ${nexusname} TO '${appversion}/${apppatch}'" --username=chenjingtao --password=cjt#2020
 
              """
        }catch (e){
