@@ -34,7 +34,7 @@ def uploadSvn(appversion,apppatch,nexusname,apppackage){
             ## add war
             cp ${WORKSPACE}/${apppackage} .
             ## ${nexusname}
-            cd ${JOB_NAME}/yunwei/MicroService/${appversion}
+            cd ${WORKSPACE}/yunwei/MicroService/${appversion}
             # 添加所有文件
             svn add . --no-ignore --force
             svn commit -m "Update ${nexusname} TO '${appversion}/${apppatch}'" --username=chenjingtao --password=cjt#2020
