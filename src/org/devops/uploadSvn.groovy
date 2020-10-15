@@ -16,24 +16,24 @@ def uploadSvn(appversion,apppatch,nexusname,apppackage){
             cd MicroService
 
             ## 查询是否有重复的版本
-            svn up --set-depth=immediates ${appversion}/${apppatch} --username=chenjingtao --password=cjt#2020
+            svn up --set-depth=immediates ${appversion} --username=chenjingtao --password=cjt#2020
 
             ## 创建版本
-            mkdir -pv ${appversion}/${apppatch}
+            mkdir -pv ${appversion}/
             ## 进入版本
-            cd ${appversion}/${apppatch}
+            cd ${appversion}/
 
             ## 查询是否有重复的项目
             svn up ${nexusname} --username=chenjingtao --password=cjt#2020
 
             ## 创建版本
-            mkdir -pv ${nexusname}
+            mkdir -pv ${nexusname}/${apppatch}
             ## 进入版本
-            cd ${nexusname}
+            cd ${nexusname}/${apppatch}
 
             ## add war
             cp ${WORKSPACE}/${apppackage} .
-            ## ${nexusname}
+            ## ${nexusname}/${apppatch}
             cd ${WORKSPACE}/yunwei/MicroService/${appversion}
             # 添加所有文件
             svn add . --no-ignore --force
