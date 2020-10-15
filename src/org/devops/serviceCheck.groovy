@@ -7,8 +7,8 @@ def serviceCheck(deploytype,deployip,jobname,servicename){
              
              """
        }catch (e){
-            currentBuild.description="日志输出失败!"
-            error '日志输出失败!'
+            currentBuild.description="${servicename}服务检查失败!"
+            error '${servicename}服务检查失败!'
         }
     }
     if (deploytype == 'salt'){
@@ -22,8 +22,8 @@ def serviceCheck(deploytype,deployip,jobname,servicename){
              salt ${deployip} state.sls service_check-${jobname}
              """
        }catch (e){
-            currentBuild.description="日志输出失败!"
-            error '日志输出失败!'
+            currentBuild.description="${servicename}服务检查失败!"
+            error '${servicename}服务检查失败!'
         }
     }
 }
