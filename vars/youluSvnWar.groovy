@@ -102,7 +102,7 @@ pipeline {
                for (item in map.DEV_IP.tokenize(',')){
                    echo "deploy ${ENV}" 
                    echo "deploy ${item}"
-                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}"
+                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
                    sh "salt ${item} cmd.run '${map.DEPLOY_COMMAND}'"
                    
                 }
@@ -111,7 +111,7 @@ pipeline {
                for (item in map.TEST_IP.tokenize(',')){
                    echo "deploy ${ENV}" 
                    echo "deploy ${item}"
-                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}"
+                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
                    sh "salt ${item} cmd.run '${map.DEPLOY_COMMAND}'"
                    
                 }
@@ -121,7 +121,7 @@ pipeline {
                for (item in map.UAT_IP.tokenize(',')){
                    echo "deploy ${ENV}" 
                    echo "deploy ${item}"
-                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}"
+                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
                    sh "salt ${item} cmd.run '${map.DEPLOY_COMMAND}'"
                    
                 }
@@ -130,7 +130,7 @@ pipeline {
                for (item in map.PROD_IP.tokenize(',')){
                    echo "deploy ${ENV}" 
                    echo "deploy ${item}"
-                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}"
+                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
                    sh "salt ${item} cmd.run '${map.DEPLOY_COMMAND}'"
                   
                 }
@@ -139,7 +139,7 @@ pipeline {
                for (item in map.PROD_IP.tokenize(',')){
                    echo "deploy ${ENV}" 
                    echo "deploy ${item}"
-                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}"
+                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
                    sh "salt ${item} cmd.run '${map.DEPLOY_COMMAND}'"
                    
                 }
