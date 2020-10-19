@@ -209,7 +209,7 @@ pipeline {
             script {
             if (params.ENV == "dev") {
                sh "sleep 5s"
-               sh "cp /data/build-devops/service_check.sh /data/jenkins_home/workspace/${JOB_NAME}/"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
                sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
                for (item in map.DEV_IP.tokenize(',')){
                    echo "${item}：查看服务进程是否存在"
@@ -219,7 +219,7 @@ pipeline {
             }
             if (params.ENV == "test") {
                sh "sleep 5s"
-               sh "cp /data/build-devops/service_check.sh /data/jenkins_home/workspace/${JOB_NAME}/"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
                sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
                for (item in map.TEST_IP.tokenize(',')){
                    echo "${item}：查看服务进程是否存在"
@@ -229,7 +229,7 @@ pipeline {
             }
             if (params.ENV == "uat") {
                sh "sleep 5s"
-               sh "cp /data/build-devops/service_check.sh /data/jenkins_home/workspace/${JOB_NAME}/"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
                sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
                for (item in map.UAT_IP.tokenize(',')){
                    echo "${item}：查看服务进程是否存在"
@@ -239,7 +239,7 @@ pipeline {
             }
             if (params.ENV == "prod") {
                sh "sleep 5s"
-               sh "cp /data/build-devops/service_check.sh /data/jenkins_home/workspace/${JOB_NAME}/"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
                sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
                for (item in map.PROD_IP.tokenize(',')){
                    echo "${item}：查看服务进程是否存在"
@@ -249,7 +249,7 @@ pipeline {
             }
             if (params.ENV == "rollback") {
                sh "sleep 5s"
-               sh "cp /data/build-devops/service_check.sh /data/jenkins_home/workspace/${JOB_NAME}/"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
                sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
                for (item in map.PROD_IP.tokenize(',')){
                    echo "${item}：查看服务进程是否存在"
