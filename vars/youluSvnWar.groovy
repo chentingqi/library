@@ -83,7 +83,7 @@ pipeline {
                       } 
                 }
             steps {
-            checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', excludedRegions: '', excludedRevprop: '', excludedUsers: '', filterChangelog: false, ignoreDirPropChanges: false, includedRegions: '', locations: [[cancelProcessOnExternalsFail: true, credentialsId: 'renshuaipeng', depthOption: 'infinity', ignoreExternalsOption: true, local: '.', remote: "${SVNURL}"]], quietOperation: true, workspaceUpdater: [$class: 'UpdateUpdater']])
+            checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', excludedRegions: '', excludedRevprop: '', excludedUsers: '', filterChangelog: false, ignoreDirPropChanges: false, includedRegions: '', locations: [[cancelProcessOnExternalsFail: true, credentialsId: 'renshuaipeng', depthOption: 'infinity', ignoreExternalsOption: true, local: '.', remote: "http://171.15.16.189:11080/svn/youlu/MicroService/${PROJECT_VERSION}/BaseData"]], quietOperation: true, workspaceUpdater: [$class: 'UpdateUpdater']])
             }
         }
         stage('部署服务'){
