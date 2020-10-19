@@ -295,7 +295,6 @@ pipeline {
           <div id="sum0">
           <h2>制品信息</h2>
           <ul>
-          <li>SVN项目的地址 : <a>${SVNURL}</a></li>
 	      <li>制品库地址 : <a href="http://192.168.10.82:8081">http://192.168.10.82:8081</a></li>
 	      <li>本次生成制品 ：${map.WAR}</li>
 	      <li>本次提测版本 : ${NEXUS_REP}.${NEXUS_PATCH}</li>
@@ -336,7 +335,6 @@ pipeline {
           <div id="sum0">
           <h2>制品信息</h2>
           <ul>
-          <li>SVN项目的地址 : <a>${SVNURL}</a></li>
 	      <li>制品库地址 : <a href="http://192.168.10.82:8081">http://192.168.10.82:8081</a></li>
 	      <li>本次生成制品 ：${map.WAR}</li>
 	      <li>本次提测版本 : ${NEXUS_REP}.${NEXUS_PATCH}</li>
