@@ -214,7 +214,7 @@ pipeline {
                for (item in map.DEV_IP.tokenize(',')){
                    echo "${item}：查看服务进程是否存在"
                    sh "salt ${item} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
-                   sh "salt ${item} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${item} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
                }
             }
             if (params.ENV == "test") {
@@ -224,7 +224,7 @@ pipeline {
                for (item in map.TEST_IP.tokenize(',')){
                    echo "${item}：查看服务进程是否存在"
                    sh "salt ${item} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
-                   sh "salt ${item} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${item} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
                }
             }
             if (params.ENV == "uat") {
@@ -234,7 +234,7 @@ pipeline {
                for (item in map.UAT_IP.tokenize(',')){
                    echo "${item}：查看服务进程是否存在"
                    sh "salt ${item} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
-                   sh "salt ${item} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${item} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
                }
             }
             if (params.ENV == "prod") {
@@ -244,7 +244,7 @@ pipeline {
                for (item in map.PROD_IP.tokenize(',')){
                    echo "${item}：查看服务进程是否存在"
                    sh "salt ${item} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
-                   sh "salt ${item} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${item} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
                }
             }
             if (params.ENV == "rollback") {
@@ -254,7 +254,7 @@ pipeline {
                for (item in map.PROD_IP.tokenize(',')){
                    echo "${item}：查看服务进程是否存在"
                    sh "salt ${item} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
-                   sh "salt ${item} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${item} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
                }
             }
             }
