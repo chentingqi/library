@@ -22,7 +22,6 @@ pipeline {
     )
     string(name: 'APP_VERSION', defaultValue: "${map.APP_VERSION}",description: 'API测试地址') 
     string(name: 'SVN_BRANCH_VERSION', defaultValue: "${map.SVN_BRANCH_VERSION}",description: 'API测试地址') 
-    string(name: 'APP_NAME', defaultValue: "${map.APP_NAME}",description: 'API测试地址') 
     string(name: 'PROJECT_VERSION', defaultValue: "${map.PROJECT_VERSION}",description: 'API测试地址') 
      
     }
