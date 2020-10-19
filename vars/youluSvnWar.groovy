@@ -20,6 +20,11 @@ pipeline {
         name: 'ENV',
         choices: ['dev','test','uat','prod','rollback']
     )
+    choice(
+        description: '版本',
+        name: 'VERSION',
+        choices: ["${map.SVN_V}"]
+    )
     string(name: 'APP_VERSION', defaultValue: "${map.APP_VERSION}",description: '') 
     string(name: 'SVN_BRANCH_VERSION', defaultValue: "${map.SVN_BRANCH_VERSION}",description: '')
     string(name: 'APP_NAME', defaultValue: "${map.APP_NAME}",description: '') 
