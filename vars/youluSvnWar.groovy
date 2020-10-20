@@ -26,8 +26,11 @@ pipeline {
     )
     string(name: 'APP_VERSION', defaultValue: "${map.APP_VERSION}",description: '')
     string(name: 'SVN_BRANCH_VERSION', defaultValue: "${map.SVN_BRANCH_VERSION}",description: '')
-    string(name: 'APP_NAME', defaultValue: "${map.APP_NAME}",description: '') 
-    string(name: 'PROJECT_VERSION', defaultValue: "",description: '从stable开始，手工输入上线版本号') 
+    choice(
+        description: '上线版本号',
+        name: 'PROJECT_VERSION',
+        choices: ['3.1.79','3.1.80','3.1.81','3.1.82','test111','test222']
+    )
     choice(
         description: '版本补丁',
         name: 'PROJECT_PATCH',
