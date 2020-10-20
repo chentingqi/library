@@ -96,7 +96,8 @@ pipeline {
             }
         }
         stage('网关改配节点1'){
-            when { anyOf { environment name: 'ENV', value: 'prod' } }
+            when { anyOf { environment name: 'ENV', value: 'uat' ;
+                           environment name: 'ENV', value: 'prod' } }
             steps {
                   sh "${map.EDIT_GATEWAT1}"
             
@@ -237,7 +238,8 @@ pipeline {
             }
         }
         stage('网关改配节点2'){
-            when { anyOf { environment name: 'ENV', value: 'prod' } }
+            when { anyOf { environment name: 'ENV', value: 'uat' ;
+                           environment name: 'ENV', value: 'prod' } }
             steps {
                   sh "${map.EDIT_GATEWAT2}"
             }
@@ -371,7 +373,8 @@ pipeline {
             }
         }
         stage('网关改配双节点'){
-            when { anyOf { environment name: 'ENV', value: 'prod' } }
+            when { anyOf { environment name: 'ENV', value: 'uat' ;
+                           environment name: 'ENV', value: 'prod' } }
             steps {
                   sh "${map.EDIT_GATEWAT_ALL}"
             }
