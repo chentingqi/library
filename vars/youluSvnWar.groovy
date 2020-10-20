@@ -245,9 +245,7 @@ pipeline {
         }
         stage('部署节点2'){
             when { 
-                anyOf { environment name: 'ENV', value: 'dev' ; 
-                        environment name: 'ENV', value: 'test' ; 
-                        environment name: 'ENV', value: 'uat' ; 
+                anyOf { environment name: 'ENV', value: 'uat' ; 
                         environment name: 'ENV', value: 'prod' ; 
                         environment name: 'ENV', value: 'rollback' 
                       } 
@@ -285,9 +283,7 @@ pipeline {
         }
         stage('日志输出2'){
             when { 
-                anyOf { environment name: 'ENV', value: 'dev' ; 
-                        environment name: 'ENV', value: 'test' ; 
-                        environment name: 'ENV', value: 'uat' ; 
+                anyOf { environment name: 'ENV', value: 'uat' ; 
                         environment name: 'ENV', value: 'prod' ; 
                         environment name: 'ENV', value: 'rollback'
                       } 
