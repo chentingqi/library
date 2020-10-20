@@ -7,7 +7,7 @@ def umountSlb(nodeip){
               python /data/SLB/aliyun-python-sdk-slb-3.2.18/cjt/RemoveVServerGroupBackendServers-80-59.py
            """
         }catch(e){
-             currentBuild.description="从SLB上卸载${nodeip}失!"
+             currentBuild.description="从SLB上卸载${nodeip}失败!"
              echo "从SLB上卸载${nodeip}失败"
         }
     }
@@ -17,7 +17,7 @@ def umountSlb(nodeip){
               python /data/SLB/aliyun-python-sdk-slb-3.2.18/cjt/RemoveVServerGroupBackendServers-80-65.py
            """
         }catch(e){
-             currentBuild.description="从SLB上卸载${nodeip}失!"
+             currentBuild.description="从SLB上卸载${nodeip}失败!"
              echo "从SLB上卸载${nodeip}失败"
         }
     }
