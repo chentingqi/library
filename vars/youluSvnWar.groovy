@@ -26,6 +26,7 @@ pipeline {
     )
     string(name: 'APP_VERSION', defaultValue: "${map.APP_VERSION}",description: '')
     string(name: 'SVN_BRANCH_VERSION', defaultValue: "${map.SVN_BRANCH_VERSION}",description: '')
+    string(name: 'APP_NAME', defaultValue: "${map.APP_NAME}",description: '') 
     choice(
         description: '上线版本号',
         name: 'PROJECT_VERSION',
