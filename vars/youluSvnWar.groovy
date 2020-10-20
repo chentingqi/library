@@ -392,7 +392,7 @@ pipeline {
 </html>
 
 
-    ''', subject: "'${ENV}环境：${env.JOB_NAME} [${env.BUILD_NUMBER}]' 构建${BUILD_STATUS}", to: "${map.EMAILLIST}", from: 'chenjingtao@jiaoyu361.com'
+    ''', subject: "'${ENV}环境：${env.JOB_NAME} [${env.BUILD_NUMBER}]' 构建${env.BUILD_STATUS}", to: "${map.EMAILLIST}", from: 'chenjingtao@jiaoyu361.com'
 
             
         }
