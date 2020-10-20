@@ -37,7 +37,7 @@ pipeline {
     }
     stages{
         stage("拉取代码") {
-            when { anyOf { environment name: 'ENV', value: 'dev' } }
+            when { anyOf { environment name: 'ENV', value: 'test' } }
             steps {
                 sh "echo code pull"
                 checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', 
@@ -50,7 +50,7 @@ pipeline {
         }
 
         stage('代码扫描'){
-            when { anyOf { environment name: 'ENV', value: 'dev' } }
+            when { anyOf { environment name: 'ENV', value: 'test' } }
             steps {
              withSonarQubeEnv('sonar') {
              sh "echo SONAR启动 "
@@ -70,7 +70,7 @@ pipeline {
             }
         }
         stage('代码构建'){
-            when { anyOf { environment name: 'ENV', value: 'dev' } }
+            when { anyOf { environment name: 'ENV', value: 'test' } }
             steps {
             sh "echo ${map.MAVEN_BUILD_COMMAND}"
             sh "${map.MAVEN_BUILD_COMMAND}"
@@ -78,7 +78,7 @@ pipeline {
         }
         
         stage('单元测试'){
-            when { anyOf { environment name: 'ENV', value: 'dev' } }
+            when { anyOf { environment name: 'ENV', value: 'test' } }
             steps {
             sh "/data/maven/apache-maven-3.6.2/bin/mvn test -Dmaven.repo.local=/data/.repository"
             
