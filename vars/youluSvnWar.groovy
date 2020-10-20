@@ -52,15 +52,15 @@ pipeline {
              sh "cp /data/build-devops/sonar-project.properties $workspace"
              sh "sed -i 's/jobname/${JOB_NAME}/g' sonar-project.properties"
              sh "sed -i 's#workspace#$workspace#g' sonar-project.properties"
-             sh "/data/sonar-scanner-3.0.0.702-linux/bin/sonar-scanner -X -Dsonar.host.url=http://172.16.106.88:9000"
+             //sh "/data/sonar-scanner-3.0.0.702-linux/bin/sonar-scanner -X -Dsonar.host.url=http://172.16.106.88:9000"
             }
-            script {
-                timeout(time: 1, unit: "HOURS") {
-                def qg = waitForQualityGate()
-                if (qg.status != 'OK') {
+            //script {
+            //    timeout(time: 1, unit: "HOURS") {
+            //    def qg = waitForQualityGate()
+            //    if (qg.status != 'OK') {
 
-                            error "未通过Sonarqube的代码质量阈检查，请及时修改！failure: ${qg.status}"
-                }}}
+            //                error "未通过Sonarqube的代码质量阈检查，请及时修改！failure: ${qg.status}"
+            //    }}}
                 
             }
         }
