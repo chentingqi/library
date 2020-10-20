@@ -18,7 +18,7 @@ pipeline {
     choice(
         description: '选择部署环境',
         name: 'ENV',
-        choices: ['test','stable','uat','prod','rollback']
+        choices: ['dev','test','stable','uat','prod','rollback']
     )
     string(name: 'APP_VERSION', defaultValue: "${map.APP_VERSION}",description: '')
     string(name: 'SVN_BRANCH_VERSION', defaultValue: "${map.SVN_BRANCH_VERSION}",description: '')
@@ -32,7 +32,7 @@ pipeline {
     }
     stages{
         stage("拉取代码") {
-            when { anyOf { environment name: 'ENV', value: 'test' } }
+            when { anyOf { environment name: 'ENV', value: 'dev' } }
             steps {
                 sh "echo code pull"
                 checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', 
@@ -45,7 +45,7 @@ pipeline {
         }
 
         stage('代码扫描'){
-            when { anyOf { environment name: 'ENV', value: 'test' } }
+            when { anyOf { environment name: 'ENV', value: 'dev' } }
             steps {
              withSonarQubeEnv('sonar') {
              sh "echo SONAR启动 "
@@ -65,7 +65,7 @@ pipeline {
             }
         }
         stage('代码构建'){
-            when { anyOf { environment name: 'ENV', value: 'test' } }
+            when { anyOf { environment name: 'ENV', value: 'dev' } }
             steps {
             sh "echo ${map.MAVEN_BUILD_COMMAND}"
             sh "${map.MAVEN_BUILD_COMMAND}"
@@ -73,7 +73,7 @@ pipeline {
         }
         
         stage('单元测试'){
-            when { anyOf { environment name: 'ENV', value: 'test' } }
+            when { anyOf { environment name: 'ENV', value: 'dev' } }
             steps {
             sh "/data/apache-maven-3.6.3/bin/mvn test"
             
@@ -81,7 +81,8 @@ pipeline {
         }
         stage('拉取制品'){
             when { 
-                anyOf { environment name: 'ENV', value: 'uat' ; 
+                anyOf { environment name: 'ENV', value: 'test' ; 
+                        environment name: 'ENV', value: 'uat' ; 
                         environment name: 'ENV', value: 'prod' ; 
                         environment name: 'ENV', value: 'rollback' 
                       } 
