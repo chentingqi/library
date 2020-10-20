@@ -18,14 +18,9 @@ pipeline {
     choice(
         description: '选择部署环境',
         name: 'ENV',
-        choices: ['dev','test','uat','prod','rollback']
+        choices: ['test','stable','uat','prod','rollback']
     )
-    choice(
-        description: '版本',
-        name: 'VERSION',
-        choices: ["${map.SVN_V}"]
-    )
-    string(name: 'APP_VERSION', defaultValue: "${map.APP_VERSION}",description: '') 
+    string(name: 'APP_VERSION', defaultValue: "${map.APP_VERSION}",description: '')
     string(name: 'SVN_BRANCH_VERSION', defaultValue: "${map.SVN_BRANCH_VERSION}",description: '')
     string(name: 'APP_NAME', defaultValue: "${map.APP_NAME}",description: '') 
     string(name: 'PROJECT_VERSION', defaultValue: "${map.PROJECT_VERSION}",description: '') 
@@ -33,7 +28,7 @@ pipeline {
     }
     stages{
         stage("拉取代码") {
-            when { anyOf { environment name: 'ENV', value: 'dev' } }
+            when { anyOf { environment name: 'ENV', value: 'test' } }
             steps {
                 sh "echo code pull"
                 checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', 
@@ -46,7 +41,7 @@ pipeline {
         }
 
         stage('代码扫描'){
-            when { anyOf { environment name: 'ENV', value: 'dev' } }
+            when { anyOf { environment name: 'ENV', value: 'test' } }
             steps {
              withSonarQubeEnv('sonar') {
              sh "echo SONAR启动 "
@@ -65,7 +60,7 @@ pipeline {
             }
         }
         stage('代码构建'){
-            when { anyOf { environment name: 'ENV', value: 'dev' } }
+            when { anyOf { environment name: 'ENV', value: 'test' } }
             steps {
             sh "echo ${map.MAVEN_BUILD_COMMAND}"
             sh "${map.MAVEN_BUILD_COMMAND}"
@@ -73,7 +68,7 @@ pipeline {
         }
         
         stage('单元测试'){
-            when { anyOf { environment name: 'ENV', value: 'dev' } }
+            when { anyOf { environment name: 'ENV', value: 'test' } }
             steps {
             sh "mvn test"
             
@@ -81,8 +76,7 @@ pipeline {
         }
         stage('拉取制品'){
             when { 
-                anyOf { environment name: 'ENV', value: 'test' ; 
-                        environment name: 'ENV', value: 'uat' ; 
+                anyOf { environment name: 'ENV', value: 'uat' ; 
                         environment name: 'ENV', value: 'prod' ; 
                         environment name: 'ENV', value: 'rollback' 
                       } 
@@ -275,7 +269,130 @@ pipeline {
             }
         }
     }
+    //构建后操作
+    post {
+        always {
+            script{
+                println("always")
+            }
+            emailext body: '''
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <meta charset="UTF-8">
+        <title>${ENV, var="JOB_NAME"}-第${BUILD_NUMBER}次构建日志</title>
+        </head>
+ 
+        <body leftmargin="8" marginwidth="0" topmargin="8" marginheight="4"
+        offset="0">
+        <table width="95%" cellpadding="0" cellspacing="0"
+        style="font-size: 11pt; font-family: Tahoma, Arial, Helvetica, sans-serif">
+        <tr>
+            <td>(本邮件是程序自动下发的，请勿回复！)</td>
+        </tr>
+        <tr>
+            <td><h2>
+                    <font color="#00FF00">构建结果 - ${BUILD_STATUS}</font>
+                </h2></td>
+        </tr>
+        <tr>
+            <td><br />
+            <b><font color="#0B610B">构建信息</font></b>
+            <hr size="2" width="100%" align="center" /></td>
+        </tr>
+        <tr>
+            <td>
+                <ul>
+                    <li>项目名称&nbsp;：&nbsp;${PROJECT_NAME}</li>
+                    <li>构建编号&nbsp;：&nbsp;第${BUILD_NUMBER}次构建</li>
+                    <li>触发原因：&nbsp;${CAUSE}</li>
+                    <li>流水线Url&nbsp;：&nbsp;<a href="${JENKINS_URL}blue/organizations/jenkins/${JOB_NAME}/detail/${JOB_NAME}/${BUILD_NUMBER}/pipeline">${JENKINS_URL}blue/organizations/jenkins/${JOB_NAME}/detail/${JOB_NAME}/${BUILD_NUMBER}/pipeline</a></li>
+                    <li>构建&nbsp;&nbsp;Url&nbsp;：&nbsp;<a href="${BUILD_URL}">${BUILD_URL}</a></li>
+                    <li>项目&nbsp;&nbsp;Url&nbsp;：&nbsp;<a href="${PROJECT_URL}">${PROJECT_URL}</a></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><br />
+            <b><font color="#0B610B">部署信息</font></b>
+            <hr size="2" width="100%" align="center" /></td>
+        </tr>
+        <tr>
+            <td>
+                <ul>
+                    <li>部署环境&nbsp;：&nbsp;${ENV}</li>
+                    <li>代码版本&nbsp;：&nbsp;${SVN_BRANCH_VERSION}</li>
+                    <li>制品版本&nbsp;：&nbsp;${PROJECT_VERSION}</li>
+                    <li>代码扫描地址：&nbsp;<a href="http://192.168.10.83:8081/dashboard?id=${JOB_NAME}">http://192.168.10.83:8081/dashboard?id=${JOB_NAME}</a></li>
+                    <li>制品库地址：&nbsp;<a href="http://192.168.11.247/svn/youlu/MicroService/${DEPLOY_VERSION}/${NEXUS_NAME}/${DEPLOY_PATCH}">http://192.168.11.247/svn/youlu/MicroService/${DEPLOY_VERSION}/${NEXUS_NAME}/${DEPLOY_PATCH}</a></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><b><font color="#0B610B">Changes Since Last
+                        Successful Build:</font></b>
+            <hr size="2" width="100%" align="center" /></td>
+        </tr>
+        <tr>
+            <td>
+                <ul>
+                    <li>历史变更记录 : <a href="${PROJECT_URL}changes">${PROJECT_URL}changes</a></li>
+                </ul> ${CHANGES_SINCE_LAST_SUCCESS,reverse=true, format="Changes for Build #%n:<br />%c<br />",showPaths=true,changesFormat="<pre>[%a]<br />%m</pre>",pathFormat="&nbsp;&nbsp;&nbsp;&nbsp;%p"}
+            </td>
+        </tr>
+        <tr>
+            <td><b>Failed Test Results</b>
+            <hr size="2" width="100%" align="center" /></td>
+        </tr>
+        <tr>
+            <td><pre
+                    style="font-size: 11pt; font-family: Tahoma, Arial, Helvetica, sans-serif">$FAILED_TESTS</pre>
+                <br /></td>
+        </tr>
+        <tr>
+            <td><b><font color="#0B610B">构建日志 (最后 100行):</font></b>
+            <hr size="2" width="100%" align="center" /></td>
+        </tr>
+        <!-- <tr>
+            <td>Test Logs (if test has ran): <a
+                href="${PROJECT_URL}ws/TestResult/archive_logs/Log-Build-${BUILD_NUMBER}.zip">${PROJECT_URL}/ws/TestResult/archive_logs/Log-Build-${BUILD_NUMBER}.zip</a>
+                <br />
+            <br />
+            </td>
+        </tr> -->
+        <tr>
+            <td><textarea cols="80" rows="30" readonly="readonly"
+                    style="font-family: Courier New">${BUILD_LOG, maxLines=100}</textarea>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
 
+
+    ''', subject: "'${ENV}环境：${env.JOB_NAME} [${env.BUILD_NUMBER}]' 构建成功", to: "${EMAILLIST}", from: 'chenjingtao@jiaoyu361.com'
+
+            
+        }
+
+        success {
+            script{
+                currentBuild.description = "\n ${ENV}-${PROJECT_VERSION}构建成功!" 
+            }
+        }
+
+        failure {
+            script{
+                currentBuild.description = "\n ${ENV}-${PROJECT_VERSION}构建失败!" 
+            }
+        }
+
+        aborted {
+            script{
+                currentBuild.description = "\n ${ENV}-${PROJECT_VERSION}构建取消!" 
+            }
+        }
+    }
+}
 }
 
-}
