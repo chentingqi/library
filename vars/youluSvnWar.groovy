@@ -27,7 +27,7 @@ pipeline {
     choice(
         description: '版本补丁',
         name: 'PROJECT_PATCH',
-        choices: ['001','002','hotfix01']
+        choices: ['','001','002','hotfix01']
     )
     }
     stages{
