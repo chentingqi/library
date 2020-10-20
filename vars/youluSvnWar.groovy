@@ -269,7 +269,7 @@ pipeline {
         }
         stage('上传SVN制品库'){
             when { 
-                anyOf { environment name: 'ENV', value: 'test' 
+                anyOf { environment name: 'ENV', value: 'stable' 
                       } 
             }
             steps{
