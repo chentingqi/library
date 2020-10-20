@@ -29,6 +29,7 @@ pipeline {
         name: 'PROJECT_PATCH',
         choices: ['','001','002','hotfix01']
     )
+    string(name: 'API_HOST', defaultValue: "${map.API_HOST}",description: '')
     }
     stages{
         stage("拉取代码") {
