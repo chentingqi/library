@@ -22,7 +22,7 @@ pipeline {
     choice(
         description: '选择部署环境',
         name: 'ENV',
-        choices: ['dev','test','stable','uat','prod','rollback']
+        choices: ['test','stable','uat','prod','rollback']
     )
     string(name: 'APP_VERSION', defaultValue: "${map.APP_VERSION}",description: '')
     string(name: 'SVN_BRANCH_VERSION', defaultValue: "${map.SVN_BRANCH_VERSION}",description: '')
