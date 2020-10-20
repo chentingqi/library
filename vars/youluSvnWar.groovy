@@ -393,6 +393,10 @@ pipeline {
             }
 
         stage('API测试'){
+            when { anyOf { environment name: 'ENV', value: 'test' ;
+                           environment name: 'ENV', value: 'uat' ;
+                           environment name: 'ENV', value: 'prod' 
+            } }
             steps{
             sh "echo 进行API自动化测试"
             //sh "rm -rf *"
