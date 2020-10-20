@@ -51,7 +51,7 @@ pipeline {
              sh "echo SONAR启动 "
              sh "cp /data/build-devops/sonar-project.properties $workspace"
              sh "sed -i 's/jobname/${JOB_NAME}/g' sonar-project.properties"
-             sh "sed -i 's/workspace/$workspace/g' sonar-project.properties"
+             sh "sed -i 's#workspace#$workspace#g' sonar-project.properties"
              sh "/data/sonar-scanner-3.0.0.702-linux/bin/sonar-scanner -X -Dsonar.host.url=http://172.16.106.88:9000"
             }
             script {
