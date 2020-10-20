@@ -390,7 +390,7 @@ pipeline {
 </html>
 
 
-    ''', subject: "'${ENV}环境：${env.JOB_NAME} [${env.BUILD_NUMBER}]' 构建成功", to: "${EMAILLIST}", from: 'chenjingtao@jiaoyu361.com'
+    ''', subject: "'${ENV}环境：${env.JOB_NAME} [${env.BUILD_NUMBER}]' 构建成功", to: "${map.EMAILLIST}", from: 'chenjingtao@jiaoyu361.com'
 
             
         }
