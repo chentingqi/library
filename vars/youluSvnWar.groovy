@@ -20,7 +20,7 @@ pipeline {
         name: 'ENV',
         choices: ['dev','test','stable','uat','prod','rollback']
     )
-    string(name: 'APP_VERSION', defaultValue: "${map.APP_VERSION}",description: '')
+    string(name: 'APP_VERSION', defaultValue: "3.1.54",description: '')
     string(name: 'SVN_BRANCH_VERSION', defaultValue: "20200921",description: '')
     string(name: 'APP_NAME', defaultValue: "${map.APP_NAME}",description: '') 
     string(name: 'PROJECT_VERSION', defaultValue: "${map.PROJECT_VERSION}",description: '') 
