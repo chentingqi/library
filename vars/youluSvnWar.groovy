@@ -86,8 +86,7 @@ pipeline {
         }
         stage('拉取制品'){
             when { 
-                anyOf { environment name: 'ENV', value: 'test' ; 
-                        environment name: 'ENV', value: 'uat' ; 
+                anyOf { environment name: 'ENV', value: 'uat' ; 
                         environment name: 'ENV', value: 'prod' ; 
                         environment name: 'ENV', value: 'rollback' 
                       } 
