@@ -24,7 +24,11 @@ pipeline {
     string(name: 'SVN_BRANCH_VERSION', defaultValue: "${map.SVN_BRANCH_VERSION}",description: '')
     string(name: 'APP_NAME', defaultValue: "${map.APP_NAME}",description: '') 
     string(name: 'PROJECT_VERSION', defaultValue: "${map.PROJECT_VERSION}",description: '') 
-     
+    choice(
+        description: '版本补丁',
+        name: 'PROJECT_PATCH',
+        choices: ['001','002','hotfix01']
+    )
     }
     stages{
         stage("拉取代码") {
@@ -260,6 +264,21 @@ pipeline {
             }
             }
         }
+        stage('上传SVN制品库'){
+            when { 
+                anyOf { environment name: 'ENV', value: 'stable' 
+                      } 
+            }
+            steps{
+            sh "cp /data/build-devops/svn/svn-upload.sh $workspace"
+            sh "sed -i 's/app_version/${PROJECT_VERSION}/g' svn-upload.sh"
+            sh "sed -i 's/app_patch/${PROJECT_PATCH}/g' svn-upload.sh"
+            sh "sed -i 's/nexus_name/${map.NEXUS_NAME}/g' svn-upload.sh"
+            sh "sed -i 's/app_package/${map.WAR}/g' svn-upload.sh"
+            sh "sh svn-upload.sh"
+            }
+            }
+
         stage('API测试'){
             steps{
             sh "echo 进行API自动化测试"
