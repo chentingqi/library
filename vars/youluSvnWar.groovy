@@ -108,7 +108,7 @@ pipeline {
                for (item in map.DEV_IP.tokenize(',')){
                    echo "deploy ${ENV}" 
                    echo "deploy ${item}"
-                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
+                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/${map.WAR} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${item} cmd.run '${map.DEPLOY_COMMAND}'"
                    
                 }
