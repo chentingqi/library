@@ -70,7 +70,7 @@ pipeline {
         stage('单元测试'){
             when { anyOf { environment name: 'ENV', value: 'test' } }
             steps {
-            sh "mvn test"
+            sh "/data/apache-maven-3.6.3/bin/mvn test"
             
         }
         }
