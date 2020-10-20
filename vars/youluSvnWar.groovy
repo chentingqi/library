@@ -80,7 +80,7 @@ pipeline {
         stage('单元测试'){
             when { anyOf { environment name: 'ENV', value: 'dev' } }
             steps {
-            sh "/data/maven/apache-maven-3.6.2/bin/mvn test"
+            sh "/data/maven/apache-maven-3.6.2/bin/mvn test -Dmaven.repo.local=/data/.repository"
             
         }
         }
