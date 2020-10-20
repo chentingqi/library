@@ -389,7 +389,7 @@ pipeline {
             sh "sed -i 's/app_version/${PROJECT_VERSION}/g' svn-upload.sh"
             sh "sed -i 's/app_patch/${PROJECT_PATCH}/g' svn-upload.sh"
             sh "sed -i 's/nexus_name/${map.NEXUS_NAME}/g' svn-upload.sh"
-            sh "sed -i 's/app_package/${map.WAR_NAME}/g' svn-upload.sh"
+            sh "sed -i 's/app_package/${map.WAR}/g' svn-upload.sh"
             sh "sh svn-upload.sh"
             }
             }
