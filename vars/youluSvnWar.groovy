@@ -7,8 +7,12 @@ pipeline {
             label "${map.node}"
     }
     options {
-        //保持构建的最大个数
+        timestamps()  //日志会有时间
+        skipDefaultCheckout()  //删除隐式checkout scm语句
+        disableConcurrentBuilds() //禁止并行
         buildDiscarder(logRotator(numToKeepStr: '5')) 
+        timeout(time: 1, unit: 'HOURS')  //流水线超时设置1h
+
     }
     environment {
         examples_var1 = sh(script: 'echo "当前的时间是: `date`"', returnStdout: true).trim()
@@ -20,8 +24,8 @@ pipeline {
         name: 'ENV',
         choices: ['dev','test','stable','uat','prod','rollback']
     )
-    string(name: 'APP_VERSION', defaultValue: "3.1.54",description: '')
-    string(name: 'SVN_BRANCH_VERSION', defaultValue: "20200921",description: '')
+    string(name: 'APP_VERSION', defaultValue: "${map.APP_VERSION}",description: '')
+    string(name: 'SVN_BRANCH_VERSION', defaultValue: "${map.SVN_BRANCH_VERSION}",description: '')
     string(name: 'APP_NAME', defaultValue: "${map.APP_NAME}",description: '') 
     string(name: 'PROJECT_VERSION', defaultValue: "${map.PROJECT_VERSION}",description: '') 
     choice(
@@ -92,7 +96,14 @@ pipeline {
             checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', excludedRegions: '', excludedRevprop: '', excludedUsers: '', filterChangelog: false, ignoreDirPropChanges: false, includedRegions: '', locations: [[cancelProcessOnExternalsFail: true, credentialsId: 'chenjingtao-svn', depthOption: 'infinity', ignoreExternalsOption: true, local: '.', remote: "http://171.15.16.189:11080/svn/youlu/MicroService/${PROJECT_VERSION}/${map.NEXUS_NAME}"]], quietOperation: true, workspaceUpdater: [$class: 'UpdateUpdater']])
             }
         }
-        stage('部署服务'){
+        stage('网关改配节点1'){
+            when { anyOf { environment name: 'ENV', value: 'prod' } }
+            steps {
+                  sh "${map.EDIT_GATEWAT1}"
+            
+        }
+        }
+        stage('部署节点1'){
             when { 
                 anyOf { environment name: 'ENV', value: 'dev' ; 
                         environment name: 'ENV', value: 'test' ; 
@@ -154,7 +165,7 @@ pipeline {
         }
             }
         }
-        stage('日志输出'){
+        stage('日志输出1'){
             when { 
                 anyOf { environment name: 'ENV', value: 'dev' ; 
                         environment name: 'ENV', value: 'test' ; 
@@ -203,7 +214,7 @@ pipeline {
             }
         }
         }
-        stage('服务检查'){
+        stage('服务检查1'){
             when { 
                 anyOf { environment name: 'ENV', value: 'dev' ; 
                         environment name: 'ENV', value: 'test' ; 
@@ -265,6 +276,193 @@ pipeline {
                }
             }
             }
+            }
+        }
+        stage('网关改配节点2'){
+            when { anyOf { environment name: 'ENV', value: 'prod' } }
+            steps {
+                  sh "${map.EDIT_GATEWAT2}"
+            }
+        }
+        stage('部署节点3'){
+            when { 
+                anyOf { environment name: 'ENV', value: 'dev' ; 
+                        environment name: 'ENV', value: 'test' ; 
+                        environment name: 'ENV', value: 'uat' ; 
+                        environment name: 'ENV', value: 'prod' ; 
+                        environment name: 'ENV', value: 'rollback' 
+                      } 
+                }
+            steps {
+            script {
+            
+            if (params.ENV == "dev") {
+               
+               for (item in map.DEV_IP.tokenize(',')){
+                   echo "deploy ${ENV}" 
+                   echo "deploy ${item}"
+                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/${map.WAR} ${map.DEPLOY_DIR}/${map.WAR}"
+                   sh "salt ${item} cmd.run '${map.DEPLOY_COMMAND}'"
+                   
+                }
+            }
+            if (params.ENV == "test") {
+               for (item in map.TEST_IP.tokenize(',')){
+                   echo "deploy ${ENV}" 
+                   echo "deploy ${item}"
+                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
+                   sh "salt ${item} cmd.run '${map.DEPLOY_COMMAND}'"
+                   
+                }
+            }
+            if (params.ENV == "uat") {
+               
+               for (item in map.UAT_IP.tokenize(',')){
+                   echo "deploy ${ENV}" 
+                   echo "deploy ${item}"
+                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
+                   sh "salt ${item} cmd.run '${map.DEPLOY_COMMAND}'"
+                   
+                }
+            }
+            if (params.ENV == "prod") {
+               for (item in map.PROD_IP.tokenize(',')){
+                   echo "deploy ${ENV}" 
+                   echo "deploy ${item}"
+                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
+                   sh "salt ${item} cmd.run '${map.DEPLOY_COMMAND}'"
+                  
+                }
+            }
+            if (params.ENV == "rollback") {
+               for (item in map.PROD_IP.tokenize(',')){
+                   echo "deploy ${ENV}" 
+                   echo "deploy ${item}"
+                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
+                   sh "salt ${item} cmd.run '${map.DEPLOY_COMMAND}'"
+                   
+                }
+            }
+        }
+            }
+        }
+        stage('日志输出2'){
+            when { 
+                anyOf { environment name: 'ENV', value: 'dev' ; 
+                        environment name: 'ENV', value: 'test' ; 
+                        environment name: 'ENV', value: 'uat' ; 
+                        environment name: 'ENV', value: 'prod' ; 
+                        environment name: 'ENV', value: 'rollback'
+                      } 
+                }
+            steps {
+            script {
+            if (params.ENV == "dev") {
+               sh "sleep 5s"
+               for (item in map.DEV_IP.tokenize(',')){
+                   echo "${item}：获取服务最后100行日志"
+                   sh "salt ${item} cmd.run 'tail -n100 ${map.APP_LOG}'"
+               }
+            }
+            if (params.ENV == "test") {
+               sh "sleep 5s"
+               for (item in map.TEST_IP.tokenize(',')){
+                   echo "${item}：获取服务最后100行日志"
+                   sh "salt ${item} cmd.run 'tail -n100 ${map.APP_LOG}'"
+               }
+            }
+            if (params.ENV == "uat") {
+               sh "sleep 5s"
+               for (item in map.TEST_IP.tokenize(',')){
+                   echo "${item}：获取服务最后100行日志"
+                   sh "salt ${item} cmd.run 'tail -n100 ${map.APP_LOG}'"
+               }
+            }
+            if (params.ENV == "prod") {
+               sh "sleep 5s"
+               for (item in map.TEST_IP.tokenize(',')){
+                   echo "${item}：获取服务最后100行日志"
+                   sh "salt ${item} cmd.run 'tail -n100 ${map.APP_LOG}'"
+               }
+            }
+            if (params.ENV == "rollback") {
+               sh "sleep 5s"
+               for (item in map.TEST_IP.tokenize(',')){
+                   echo "${item}：获取服务最后100行日志"
+                   sh "salt ${item} cmd.run 'tail -n100 ${map.APP_LOG}'"
+               }
+            }
+            }
+        }
+        }
+        stage('服务检查2'){
+            when { 
+                anyOf { environment name: 'ENV', value: 'dev' ; 
+                        environment name: 'ENV', value: 'test' ; 
+                        environment name: 'ENV', value: 'uat' ; 
+                        environment name: 'ENV', value: 'prod' ; 
+                        environment name: 'ENV', value: 'rollback'
+                      } 
+                }
+            steps {
+            script {
+            if (params.ENV == "dev") {
+               sh "sleep 5s"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
+               sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
+               for (item in map.DEV_IP.tokenize(',')){
+                   echo "${item}：查看服务进程是否存在"
+                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${item} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+               }
+            }
+            if (params.ENV == "test") {
+               sh "sleep 5s"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
+               sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
+               for (item in map.TEST_IP.tokenize(',')){
+                   echo "${item}：查看服务进程是否存在"
+                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${item} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+               }
+            }
+            if (params.ENV == "uat") {
+               sh "sleep 5s"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
+               sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
+               for (item in map.UAT_IP.tokenize(',')){
+                   echo "${item}：查看服务进程是否存在"
+                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${item} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+               }
+            }
+            if (params.ENV == "prod") {
+               sh "sleep 5s"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
+               sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
+               for (item in map.PROD_IP.tokenize(',')){
+                   echo "${item}：查看服务进程是否存在"
+                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${item} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+               }
+            }
+            if (params.ENV == "rollback") {
+               sh "sleep 5s"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
+               sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
+               for (item in map.PROD_IP.tokenize(',')){
+                   echo "${item}：查看服务进程是否存在"
+                   sh "salt ${item} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${item} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+               }
+            }
+            }
+            }
+        }
+        stage('网关改配双节点'){
+            when { anyOf { environment name: 'ENV', value: 'prod' } }
+            steps {
+                  sh "${map.EDIT_GATEWAT_ALL}"
             }
         }
         stage('上传SVN制品库'){
