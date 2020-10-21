@@ -391,6 +391,7 @@ pipeline {
             } }
             steps{
             sh "echo 进行API自动化测试"
+            sh "rm -rf api-test"
             sh "cp /data/build-devops/api-test.sh $workspace"
             sh "sed -i 's#git_url#${map.TEST_GIT}#g' api-test.sh"
             //git branch: 'master', credentialsId: "chenjingtao-git", url: "${map.TEST_GIT}"
