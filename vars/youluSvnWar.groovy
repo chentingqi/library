@@ -425,6 +425,7 @@ pipeline {
             steps{
             sh "echo 进行API自动化测试"
             //sh "rm -rf *"
+            sh "mkdir api-test && cd api-test"
             git branch: 'master', credentialsId: "chenjingtao-git", url: "${map.TEST_GIT}"
             sh "/data/maven/apache-maven-3.6.2/bin/mvn test"
             }
@@ -436,7 +437,7 @@ pipeline {
             script{
                 println("always")
             }
-            emailext attachmentsPattern: 'target/cucumber.html', body: '''
+            emailext attachmentsPattern: 'api-test/target/cucumber.html', body: '''
         <!DOCTYPE html>
         <html>
         <head>
