@@ -22,7 +22,7 @@ pipeline {
     choice(
         description: '选择部署环境',
         name: 'ENV',
-        choices: ['test','stable','uat','prod','rollback']
+        choices: ['test','stable','uat','prod','rollback-test','rollback-uat','rollback-prod']
     )
     string(name: 'APP_VERSION', defaultValue: "${map.APP_VERSION}",description: '构建成功后target目录下的版本号（test）')
     string(name: 'SVN_BRANCH_VERSION', defaultValue: "${map.SVN_BRANCH_VERSION}",description: 'SVN代码分支（test）')
@@ -100,7 +100,10 @@ pipeline {
         }
         stage('网关改配节点1'){
             when { anyOf { environment name: 'ENV', value: 'uat' ;
-                           environment name: 'ENV', value: 'prod' } }
+                           environment name: 'ENV', value: 'prod' ; 
+                           environment name: 'ENV', value: 'rollback-uat' ; 
+                           environment name: 'ENV', value: 'rollback-prod' 
+            } }
             steps {
                   sh "${map.EDIT_GATEWAT1}"
             
@@ -112,7 +115,9 @@ pipeline {
                         environment name: 'ENV', value: 'test' ; 
                         environment name: 'ENV', value: 'uat' ; 
                         environment name: 'ENV', value: 'prod' ; 
-                        environment name: 'ENV', value: 'rollback' 
+                        environment name: 'ENV', value: 'rollback-test' ; 
+                        environment name: 'ENV', value: 'rollback-uat' ; 
+                        environment name: 'ENV', value: 'rollback-prod' 
                       } 
                 }
             steps {
@@ -152,7 +157,9 @@ pipeline {
                         environment name: 'ENV', value: 'test' ; 
                         environment name: 'ENV', value: 'uat' ; 
                         environment name: 'ENV', value: 'prod' ; 
-                        environment name: 'ENV', value: 'rollback'
+                        environment name: 'ENV', value: 'rollback-test' ; 
+                        environment name: 'ENV', value: 'rollback-uat' ; 
+                        environment name: 'ENV', value: 'rollback-prod' 
                       } 
                 }
             steps {
@@ -192,7 +199,9 @@ pipeline {
                         environment name: 'ENV', value: 'test' ; 
                         environment name: 'ENV', value: 'uat' ; 
                         environment name: 'ENV', value: 'prod' ; 
-                        environment name: 'ENV', value: 'rollback'
+                        environment name: 'ENV', value: 'rollback-test' ; 
+                        environment name: 'ENV', value: 'rollback-uat' ; 
+                        environment name: 'ENV', value: 'rollback-prod' 
                       } 
                 }
             steps {
@@ -242,7 +251,10 @@ pipeline {
         }
         stage('网关改配节点2'){
             when { anyOf { environment name: 'ENV', value: 'uat' ;
-                           environment name: 'ENV', value: 'prod' } }
+                           environment name: 'ENV', value: 'prod' ; 
+                           environment name: 'ENV', value: 'rollback-uat' ; 
+                           environment name: 'ENV', value: 'rollback-prod' 
+                           } }
             steps {
                   sh "${map.EDIT_GATEWAT2}"
             }
@@ -250,8 +262,10 @@ pipeline {
         stage('部署节点2'){
             when { 
                 anyOf { environment name: 'ENV', value: 'uat' ; 
-                        environment name: 'ENV', value: 'prod' ; 
-                        environment name: 'ENV', value: 'rollback' 
+                        environment name: 'ENV', value: 'prod' ;  
+                        environment name: 'ENV', value: 'rollback-test' ; 
+                        environment name: 'ENV', value: 'rollback-uat' ; 
+                        environment name: 'ENV', value: 'rollback-prod' 
                       } 
                 }
             steps {
@@ -288,8 +302,10 @@ pipeline {
         stage('日志输出2'){
             when { 
                 anyOf { environment name: 'ENV', value: 'uat' ; 
-                        environment name: 'ENV', value: 'prod' ; 
-                        environment name: 'ENV', value: 'rollback'
+                        environment name: 'ENV', value: 'prod' ;   
+                        environment name: 'ENV', value: 'rollback-test' ; 
+                        environment name: 'ENV', value: 'rollback-uat' ; 
+                        environment name: 'ENV', value: 'rollback-prod' 
                       } 
                 }
             steps {
@@ -326,8 +342,10 @@ pipeline {
         stage('服务检查2'){
             when { 
                 anyOf { environment name: 'ENV', value: 'uat' ; 
-                        environment name: 'ENV', value: 'prod' ; 
-                        environment name: 'ENV', value: 'rollback'
+                        environment name: 'ENV', value: 'prod' ;   
+                        environment name: 'ENV', value: 'rollback-test' ; 
+                        environment name: 'ENV', value: 'rollback-uat' ; 
+                        environment name: 'ENV', value: 'rollback-prod' 
                       } 
                 }
             steps {
@@ -377,7 +395,9 @@ pipeline {
         }
         stage('网关改配双节点'){
             when { anyOf { environment name: 'ENV', value: 'uat' ;
-                           environment name: 'ENV', value: 'prod' } }
+                           environment name: 'ENV', value: 'prod' ; 
+                           environment name: 'ENV', value: 'rollback-uat' ; 
+                           environment name: 'ENV', value: 'rollback-prod'  } }
             steps {
                   sh "${map.EDIT_GATEWAT_ALL}"
             }
