@@ -124,22 +124,22 @@ pipeline {
                    sh "salt ${map.DEV_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
             }
             if (params.ENV == "test") {
-                   echo "deploy ${ENV} ${map.DEV_IP1}" 
+                   echo "deploy ${ENV} ${map.TEST_IP1}" 
                    sh "salt ${map.TEST_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.TEST_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
             }
             if (params.ENV == "uat") {
-                   echo "deploy ${ENV} ${map.DEV_IP1}" 
+                   echo "deploy ${ENV} ${map.UAT_IP1}" 
                    sh "salt ${map.UAT_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.UAT_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
             }
             if (params.ENV == "prod") {
-                   echo "deploy ${ENV} ${map.DEV_IP1}" 
+                   echo "deploy ${ENV} ${map.PROD_IP1}" 
                    sh "salt ${map.PROD_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.PROD_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
             }
             if (params.ENV == "rollback") {
-                   echo "deploy ${ENV} ${map.DEV_IP1}" 
+                   echo "deploy ${ENV} ${map.PROD_IP1}" 
                    sh "salt ${map.PROD_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.PROD_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
             }
