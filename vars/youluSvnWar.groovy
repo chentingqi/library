@@ -406,7 +406,7 @@ pipeline {
             sh "echo 进行API自动化测试"
             //sh "rm -rf *"
             git branch: 'master', credentialsId: "chenjingtao-git", url: "${map.TEST_GIT}"
-            sh "/data/maven/apache-maven-3.6.2/bin/mvn test -Dmaven.repo.local=/data/.repository"
+            sh "/data/maven/apache-maven-3.6.2/bin/mvn test"
             }
         }
     }
