@@ -95,7 +95,7 @@ pipeline {
                       } 
                 }
             steps {
-            checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', excludedRegions: '', excludedRevprop: '', excludedUsers: '', filterChangelog: false, ignoreDirPropChanges: false, includedRegions: '', locations: [[cancelProcessOnExternalsFail: true, credentialsId: 'chenjingtao-svn', depthOption: 'infinity', ignoreExternalsOption: true, local: '.', remote: "http://171.15.16.189:11080/svn/youlu/MicroService/${PROJECT_VERSION}/${map.NEXUS_NAME}"]], quietOperation: true, workspaceUpdater: [$class: 'UpdateUpdater']])
+            checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', excludedRegions: '', excludedRevprop: '', excludedUsers: '', filterChangelog: false, ignoreDirPropChanges: false, includedRegions: '', locations: [[cancelProcessOnExternalsFail: true, credentialsId: 'chenjingtao-svn', depthOption: 'infinity', ignoreExternalsOption: true, local: '.', remote: "http://171.15.16.189:11080/svn/youlu/MicroService/${PROJECT_VERSION}/${map.NEXUS_NAME}/${PROJECT_PATCH}"]], quietOperation: true, workspaceUpdater: [$class: 'UpdateUpdater']])
             }
         }
         stage('网关改配节点1'){
@@ -130,17 +130,17 @@ pipeline {
             }
             if (params.ENV == "uat") {
                    echo "deploy ${ENV} ${map.DEV_IP1}" 
-                   sh "salt ${map.UAT_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR} ${map.DEPLOY_DIR}/${map.WAR}"
+                   sh "salt ${map.UAT_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.UAT_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
             }
             if (params.ENV == "prod") {
                    echo "deploy ${ENV} ${map.DEV_IP1}" 
-                   sh "salt ${map.PROD_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR} ${map.DEPLOY_DIR}/${map.WAR}"
+                   sh "salt ${map.PROD_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.PROD_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
             }
             if (params.ENV == "rollback") {
                    echo "deploy ${ENV} ${map.DEV_IP1}" 
-                   sh "salt ${map.PROD_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR} ${map.DEPLOY_DIR}/${map.WAR}"
+                   sh "salt ${map.PROD_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.PROD_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
             }
         }
@@ -269,17 +269,17 @@ pipeline {
             }
             if (params.ENV == "uat") {
                    echo "deploy ${ENV} ${map.UAT_IP2}" 
-                   sh "salt ${map.UAT_IP2} cp.get_file salt://${JOB_NAME}/${map.WAR} ${map.DEPLOY_DIR}/${map.WAR}"
+                   sh "salt ${map.UAT_IP2} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.UAT_IP2} cmd.run '${map.DEPLOY_COMMAND}'"
             }
             if (params.ENV == "prod") {
                    echo "deploy ${ENV} ${map.PROD_IP2}" 
-                   sh "salt ${map.PROD_IP2} cp.get_file salt://${JOB_NAME}/${map.WAR} ${map.DEPLOY_DIR}/${map.WAR}"
+                   sh "salt ${map.PROD_IP2} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.PROD_IP2} cmd.run '${map.DEPLOY_COMMAND}'"
             }
             if (params.ENV == "rollback") {
                    echo "deploy ${ENV} ${map.PROD_IP2}" 
-                   sh "salt ${map.PROD_IP2} cp.get_file salt://${JOB_NAME}/${map.WAR} ${map.DEPLOY_DIR}/${map.WAR}"
+                   sh "salt ${map.PROD_IP2} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.PROD_IP2} cmd.run '${map.DEPLOY_COMMAND}'"
             }
         }
