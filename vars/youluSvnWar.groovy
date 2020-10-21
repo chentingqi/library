@@ -246,7 +246,6 @@ pipeline {
             when { 
                 anyOf { environment name: 'ENV', value: 'uat' ; 
                         environment name: 'ENV', value: 'prod' ;  
-                        environment name: 'ENV', value: 'rollback-test' ; 
                         environment name: 'ENV', value: 'rollback-uat' ; 
                         environment name: 'ENV', value: 'rollback-prod' 
                       } 
@@ -280,8 +279,7 @@ pipeline {
         stage('日志输出2'){
             when { 
                 anyOf { environment name: 'ENV', value: 'uat' ; 
-                        environment name: 'ENV', value: 'prod' ;   
-                        environment name: 'ENV', value: 'rollback-test' ; 
+                        environment name: 'ENV', value: 'prod' ;  
                         environment name: 'ENV', value: 'rollback-uat' ; 
                         environment name: 'ENV', value: 'rollback-prod' 
                       } 
@@ -314,8 +312,7 @@ pipeline {
         stage('服务检查2'){
             when { 
                 anyOf { environment name: 'ENV', value: 'uat' ; 
-                        environment name: 'ENV', value: 'prod' ;   
-                        environment name: 'ENV', value: 'rollback-test' ; 
+                        environment name: 'ENV', value: 'prod' ; 
                         environment name: 'ENV', value: 'rollback-uat' ; 
                         environment name: 'ENV', value: 'rollback-prod' 
                       } 
