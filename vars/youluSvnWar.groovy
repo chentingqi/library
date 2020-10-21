@@ -416,7 +416,7 @@ pipeline {
             script{
                 println("always")
             }
-            emailext body: '''
+            emailext attachmentsPattern: 'target/cucumber.html', body: '''
         <!DOCTYPE html>
         <html>
         <head>
