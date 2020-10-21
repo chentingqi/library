@@ -91,7 +91,9 @@ pipeline {
             when { 
                 anyOf { environment name: 'ENV', value: 'uat' ; 
                         environment name: 'ENV', value: 'prod' ; 
-                        environment name: 'ENV', value: 'rollback' 
+                        environment name: 'ENV', value: 'rollback-test' ; 
+                        environment name: 'ENV', value: 'rollback-uat' ; 
+                        environment name: 'ENV', value: 'rollback-prod' 
                       } 
                 }
             steps {
@@ -133,7 +135,17 @@ pipeline {
                    sh "salt ${map.TEST_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.TEST_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
             }
+            if (params.ENV == "rollback-test") {
+                   echo "deploy ${ENV} ${map.TEST_IP1}" 
+                   sh "salt ${map.TEST_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR} ${map.DEPLOY_DIR}/${map.WAR}"
+                   sh "salt ${map.TEST_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
+            }
             if (params.ENV == "uat") {
+                   echo "deploy ${ENV} ${map.UAT_IP1}" 
+                   sh "salt ${map.UAT_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR}"
+                   sh "salt ${map.UAT_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
+            }
+            if (params.ENV == "rollback-uat") {
                    echo "deploy ${ENV} ${map.UAT_IP1}" 
                    sh "salt ${map.UAT_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.UAT_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
@@ -143,7 +155,7 @@ pipeline {
                    sh "salt ${map.PROD_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.PROD_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
             }
-            if (params.ENV == "rollback") {
+            if (params.ENV == "rollback-prod") {
                    echo "deploy ${ENV} ${map.PROD_IP1}" 
                    sh "salt ${map.PROD_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.PROD_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
@@ -174,7 +186,17 @@ pipeline {
                    echo "${map.TEST_IP1}：获取服务最后100行日志"
                    sh "salt ${map.TEST_IP1} cmd.run 'tail -n100 ${map.APP_LOG}'"
             }
+            if (params.ENV == "rollback-test") {
+               sh "sleep 5s"
+                   echo "${map.TEST_IP1}：获取服务最后100行日志"
+                   sh "salt ${map.TEST_IP1} cmd.run 'tail -n100 ${map.APP_LOG}'"
+            }
             if (params.ENV == "uat") {
+               sh "sleep 5s"
+               echo "${map.UAT_IP1}：获取服务最后100行日志"
+               sh "salt ${map.UAT_IP1} cmd.run 'tail -n100 ${map.APP_LOG}'"
+            }
+            if (params.ENV == "rollback-uat") {
                sh "sleep 5s"
                echo "${map.UAT_IP1}：获取服务最后100行日志"
                sh "salt ${map.UAT_IP1} cmd.run 'tail -n100 ${map.APP_LOG}'"
@@ -184,7 +206,7 @@ pipeline {
                echo "${map.PROD_IP1}：获取服务最后100行日志"
                sh "salt ${map.PROD_IP1} cmd.run 'tail -n100 ${map.APP_LOG}'"
             }
-            if (params.ENV == "rollback") {
+            if (params.ENV == "rollback-prod") {
                sh "sleep 5s"
                echo "${map.PROD_IP1}：获取服务最后100行日志"
                sh "salt ${map.PROD_IP1} cmd.run 'tail -n100 ${map.APP_LOG}'"
@@ -222,7 +244,23 @@ pipeline {
                    sh "salt ${map.TEST_IP1} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
                    sh "salt ${map.TEST_IP1} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
             }
+            if (params.ENV == "rollback-test") {
+               sh "sleep 5s"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
+               sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
+                   echo "${map.TEST_IP1}：查看服务进程是否存在"
+                   sh "salt ${map.TEST_IP1} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${map.TEST_IP1} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+            }
             if (params.ENV == "uat") {
+               sh "sleep 5s"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
+               sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
+                   echo "${map.UAT_IP1}：查看服务进程是否存在"
+                   sh "salt ${map.UAT_IP1} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${map.UAT_IP1} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+            }
+            if (params.ENV == "rollback-uat") {
                sh "sleep 5s"
                sh "cp /data/build-devops/service_check.sh $workspace/"
                sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
@@ -238,7 +276,7 @@ pipeline {
                    sh "salt ${map.PROD_IP1} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
                    sh "salt ${map.PROD_IP1} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
             }
-            if (params.ENV == "rollback") {
+            if (params.ENV == "rollback-prod") {
                sh "sleep 5s"
                sh "cp /data/build-devops/service_check.sh $workspace/"
                sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
@@ -281,7 +319,17 @@ pipeline {
                    sh "salt ${map.TEST_IP2} cp.get_file salt://${JOB_NAME}/${map.WAR} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.TEST_IP2} cmd.run '${map.DEPLOY_COMMAND}'"
             }
+            if (params.ENV == "rollback-test") {
+                   echo "deploy ${ENV} ${map.TEST_IP2}" 
+                   sh "salt ${map.TEST_IP2} cp.get_file salt://${JOB_NAME}/${map.WAR} ${map.DEPLOY_DIR}/${map.WAR}"
+                   sh "salt ${map.TEST_IP2} cmd.run '${map.DEPLOY_COMMAND}'"
+            }
             if (params.ENV == "uat") {
+                   echo "deploy ${ENV} ${map.UAT_IP2}" 
+                   sh "salt ${map.UAT_IP2} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR}"
+                   sh "salt ${map.UAT_IP2} cmd.run '${map.DEPLOY_COMMAND}'"
+            }
+            if (params.ENV == "rollback-uat") {
                    echo "deploy ${ENV} ${map.UAT_IP2}" 
                    sh "salt ${map.UAT_IP2} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.UAT_IP2} cmd.run '${map.DEPLOY_COMMAND}'"
@@ -291,7 +339,7 @@ pipeline {
                    sh "salt ${map.PROD_IP2} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.PROD_IP2} cmd.run '${map.DEPLOY_COMMAND}'"
             }
-            if (params.ENV == "rollback") {
+            if (params.ENV == "rollback-prod") {
                    echo "deploy ${ENV} ${map.PROD_IP2}" 
                    sh "salt ${map.PROD_IP2} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR}"
                    sh "salt ${map.PROD_IP2} cmd.run '${map.DEPLOY_COMMAND}'"
@@ -320,7 +368,17 @@ pipeline {
                    echo "${map.TEST_IP2}：获取服务最后100行日志"
                    sh "salt ${map.TEST_IP2} cmd.run 'tail -n100 ${map.APP_LOG}'"
             }
+            if (params.ENV == "rollback-test") {
+               sh "sleep 5s"
+                   echo "${map.TEST_IP2}：获取服务最后100行日志"
+                   sh "salt ${map.TEST_IP2} cmd.run 'tail -n100 ${map.APP_LOG}'"
+            }
             if (params.ENV == "uat") {
+               sh "sleep 5s"
+               echo "${map.UAT_IP2}：获取服务最后100行日志"
+               sh "salt ${map.UAT_IP2} cmd.run 'tail -n100 ${map.APP_LOG}'"
+            }
+            if (params.ENV == "rollback-uat") {
                sh "sleep 5s"
                echo "${map.UAT_IP2}：获取服务最后100行日志"
                sh "salt ${map.UAT_IP2} cmd.run 'tail -n100 ${map.APP_LOG}'"
@@ -330,7 +388,7 @@ pipeline {
                echo "${map.PROD_IP2}：获取服务最后100行日志"
                sh "salt ${map.PROD_IP2} cmd.run 'tail -n100 ${map.APP_LOG}'"
             }
-            if (params.ENV == "rollback") {
+            if (params.ENV == "rollback-prod") {
                sh "sleep 5s"
                echo "${map.PROD_IP2}：获取服务最后100行日志"
                sh "salt ${map.PROD_IP2} cmd.run 'tail -n100 ${map.APP_LOG}'"
@@ -366,7 +424,23 @@ pipeline {
                    sh "salt ${map.TEST_IP2} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
                    sh "salt ${map.TEST_IP2} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
             }
+            if (params.ENV == "rollback-test") {
+               sh "sleep 5s"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
+               sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
+                   echo "${map.TEST_IP2}：查看服务进程是否存在"
+                   sh "salt ${map.TEST_IP2} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${map.TEST_IP2} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+            }
             if (params.ENV == "uat") {
+               sh "sleep 5s"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
+               sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
+                   echo "${map.UAT_IP2}：查看服务进程是否存在"
+                   sh "salt ${map.UAT_IP2} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${map.UAT_IP2} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+            }
+            if (params.ENV == "rollback-uat") {
                sh "sleep 5s"
                sh "cp /data/build-devops/service_check.sh $workspace/"
                sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
@@ -382,7 +456,7 @@ pipeline {
                    sh "salt ${map.PROD_IP2} cp.get_file salt://${JOB_NAME}/service_check.sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
                    sh "salt ${map.PROD_IP2} cmd.run 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
             }
-            if (params.ENV == "rollback") {
+            if (params.ENV == "rollback-prod") {
                sh "sleep 5s"
                sh "cp /data/build-devops/service_check.sh $workspace/"
                sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
@@ -420,7 +494,10 @@ pipeline {
         stage('API测试'){
             when { anyOf { environment name: 'ENV', value: 'test' ;
                            environment name: 'ENV', value: 'uat' ;
-                           environment name: 'ENV', value: 'prod' 
+                           environment name: 'ENV', value: 'prod' ; 
+                           environment name: 'ENV', value: 'rollback-test' ;
+                           environment name: 'ENV', value: 'rollback-uat' ;
+                           environment name: 'ENV', value: 'rollback-prod' 
             } }
             steps{
             sh "echo 进行API自动化测试"
