@@ -518,19 +518,19 @@ pipeline {
 
         success {
             script{
-                currentBuild.description = "\n ${ENV}-${PROJECT_VERSION}构建成功!" 
+                currentBuild.description = "\n ${ENV}-${PROJECT_VERSION}-${PROJECT_PATCH}构建成功!" 
             }
         }
 
         failure {
             script{
-                currentBuild.description = "\n ${ENV}-${PROJECT_VERSION}构建失败!" 
+                currentBuild.description = "\n ${ENV}-${PROJECT_VERSION}-${PROJECT_PATCH}构建失败!" 
             }
         }
 
         aborted {
             script{
-                currentBuild.description = "\n ${ENV}-${PROJECT_VERSION}构建取消!" 
+                currentBuild.description = "\n ${ENV}-${PROJECT_VERSION}-${PROJECT_PATCH}构建取消!" 
             }
         }
     }
