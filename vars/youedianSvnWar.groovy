@@ -137,12 +137,12 @@ pipeline {
             }
             if (params.ENV == "uat" || params.ENV == "rollback-uat") {
                    echo "deploy ${ENV} ${map.UAT_IP1}" 
-                   sh "scp ${map.WAR} msyoulu@${map.UAT_IP1}:${map.DEPLOY_DIR}"
+                   sh "scp ${map.WAR_NAME} msyoulu@${map.UAT_IP1}:${map.DEPLOY_DIR}"
                    sh "ssh msyoulu@${map.UAT_IP1} '${map.DEPLOY_COMMAND}'"
             }
             if (params.ENV == "prod" || params.ENV == "rollback-prod") {
                    echo "deploy ${ENV} ${map.PROD_IP1}" 
-                   sh "scp ${map.WAR} msyoulu@${map.PROD_IP1}:${map.DEPLOY_DIR}"
+                   sh "scp ${map.WAR_NAME} msyoulu@${map.PROD_IP1}:${map.DEPLOY_DIR}"
                    sh "ssh msyoulu@${map.PROD_IP1} '${map.DEPLOY_COMMAND}'"
             }
         }
@@ -268,12 +268,12 @@ pipeline {
             }
             if (params.ENV == "uat" || params.ENV == "rollback-uat") {
                    echo "deploy ${ENV} ${map.UAT_IP2}" 
-                   sh "scp ${map.WAR} msyoulu@${map.UAT_IP2}:${map.DEPLOY_DIR}"
+                   sh "scp ${map.WAR_NAME} msyoulu@${map.UAT_IP2}:${map.DEPLOY_DIR}"
                    sh "ssh msyoulu@${map.UAT_IP2} '${map.DEPLOY_COMMAND}'"
             }
             if (params.ENV == "prod" || params.ENV == "rollback-prod") {
                    echo "deploy ${ENV} ${map.PROD_IP2}" 
-                   sh "scp ${map.WAR} msyoulu@${map.PROD_IP2}:${map.DEPLOY_DIR}"
+                   sh "scp ${map.WAR_NAME} msyoulu@${map.PROD_IP2}:${map.DEPLOY_DIR}"
                    sh "ssh msyoulu@${map.PROD_IP2} '${map.DEPLOY_COMMAND}'"
             }
         }
