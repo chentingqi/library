@@ -1,4 +1,4 @@
-// youluSvnWar2.groovy
+// youluSvnWarUat.groovy
 
 def call(map) {
 
@@ -22,58 +22,10 @@ pipeline {
     choice(
         description: '选择部署环境',
         name: 'ENV',
-        choices: ['test','stable','uat','prod','rollback-test','rollback-uat','rollback-prod']
+        choices: ['uat','prod','rollback-uat','rollback-prod']
     )
     }
     stages{
-        stage("拉取代码") {
-            when { anyOf { environment name: 'ENV', value: 'test' } }
-            steps {
-                sh "echo code pull"
-                checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', 
-                excludedRegions: '', excludedRevprop: '', excludedUsers: '', filterChangelog: false, 
-                ignoreDirPropChanges: false, includedRegions: '', locations: [[cancelProcessOnExternalsFail: true, 
-                credentialsId: "${map.svn_cert}", depthOption: 'infinity', ignoreExternalsOption: true, local: '.', 
-                remote: "${map.svn_url}"]], quietOperation: true, workspaceUpdater: [$class: 'UpdateUpdater']])
-                
-            }
-        }
-
-        stage('代码扫描'){
-            when { anyOf { environment name: 'ENV', value: 'test' } }
-            steps {
-             withSonarQubeEnv('sonar') {
-             sh "echo SONAR启动 "
-             sh "cp /data/build-devops/sonar-project.properties $workspace"
-             sh "sed -i 's/jobname/${JOB_NAME}/g' sonar-project.properties"
-             sh "sed -i 's#workspace#$workspace#g' sonar-project.properties"
-             //sh "/data/sonar-scanner-3.0.0.702-linux/bin/sonar-scanner -X -Dsonar.host.url=http://172.16.106.88:9000"
-            }
-            //script {
-            //    timeout(time: 1, unit: "HOURS") {
-            //    def qg = waitForQualityGate()
-            //    if (qg.status != 'OK') {
-
-            //                error "未通过Sonarqube的代码质量阈检查，请及时修改！failure: ${qg.status}"
-            //    }}}
-                
-            }
-        }
-        stage('代码构建'){
-            when { anyOf { environment name: 'ENV', value: 'test' } }
-            steps {
-            sh "echo ${map.MAVEN_BUILD_COMMAND}"
-            sh "${map.MAVEN_BUILD_COMMAND}"
-        }
-        }
-        
-        stage('单元测试'){
-            when { anyOf { environment name: 'ENV', value: 'test' } }
-            steps {
-            sh "/data/maven/apache-maven-3.6.2/bin/mvn test -Dmaven.repo.local=/data/.repository"
-            
-        }
-        }
         stage('拉取制品'){
             when { 
                 anyOf { environment name: 'ENV', value: 'uat' ; 
