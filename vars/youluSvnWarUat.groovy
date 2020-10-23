@@ -336,7 +336,7 @@ pipeline {
                            environment name: 'ENV', value: 'rollback-prod' 
             } }
             steps{
-            sh "echo '${examples_var1} 发布项目：${JOB_NAME} 发布环境：${ENV} 发布版本：${PROJECT_VERSION}.${PROJECT_PATCH} 第${BUILD_NUMBER}次构建' >>/data/packages/version_list.txt"
+            //sh "echo '${examples_var1} 发布项目：${JOB_NAME} 发布环境：${ENV} 发布版本：${PROJECT_VERSION}.${PROJECT_PATCH} 第${BUILD_NUMBER}次构建' >>/data/packages/version_list.txt"
             sh "echo 进行API自动化测试"
             sh "rm -rf api-test"
             sh "cp /data/build-devops/api-test.sh $workspace"
@@ -345,6 +345,24 @@ pipeline {
             sh "sh api-test.sh"
             }
         }
+        stage("变更列表") {
+            when { 
+                anyOf { environment name: 'ENV', value: 'uat' ; 
+                        environment name: 'ENV', value: 'prod'
+                        
+                      } 
+                }
+			steps{
+				script {
+					json_file = "${env.WORKSPACE}/changelist.txt"
+					file_contents = readFile json_file
+					sh "echo '${examples_var1} 发布项目：${JOB_NAME} 发布环境：${ENV} 发布版本：${PROJECT_VERSION}.${PROJECT_PATCH} 第${BUILD_NUMBER}次构建 /n ${file_contents}' >>/data/packages/version_list.txt"
+					println file_contents
+					
+				}
+			}
+		}
+
     }
     //构建后操作
     post {
