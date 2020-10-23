@@ -337,6 +337,7 @@ pipeline {
             } }
             steps{
             echo "当前时间是：${examples_var1}"
+            sh "echo '${examples_var1} 发布项目：${JOB_NAME} 发布环境：${ENV} 发布版本：${PROJECT_VERSION}.${PROJECT_PATCH}' >>/data/packages/version_list.txt"
             sh "echo 进行API自动化测试"
             sh "rm -rf api-test"
             sh "cp /data/build-devops/api-test.sh $workspace"
