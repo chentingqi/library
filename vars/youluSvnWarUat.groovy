@@ -46,7 +46,9 @@ pipeline {
                       } 
                 }
             steps {
+            if (params.PROJECT_VERSION != "null") {
             checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', excludedRegions: '', excludedRevprop: '', excludedUsers: '', filterChangelog: false, ignoreDirPropChanges: false, includedRegions: '', locations: [[cancelProcessOnExternalsFail: true, credentialsId: 'chenjingtao-svn', depthOption: 'infinity', ignoreExternalsOption: true, local: '.', remote: "http://171.15.16.189:11080/svn/youlu/MicroService/${PROJECT_VERSION}/${map.NEXUS_NAME}/${PROJECT_PATCH}"]], quietOperation: true, workspaceUpdater: [$class: 'UpdateUpdater']])
+            }
             }
         }
         stage('网关改配节点1'){
