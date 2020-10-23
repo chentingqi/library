@@ -88,15 +88,25 @@ pipeline {
                    sh "salt ${map.TEST_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
                    sh "salt ${map.TEST_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
             }
-            if (params.ENV == "uat" || params.ENV == "rollback-uat") {
+            if (params.ENV == "uat") {
                    echo "deploy ${ENV} ${map.UAT_IP1}" 
                    sh "salt ${map.UAT_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
                    sh "salt ${map.UAT_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
             }
-            if (params.ENV == "prod" || params.ENV == "rollback-prod") {
+            if (params.ENV == "rollback-uat") {
+                   echo "deploy ${ENV} ${map.UAT_IP1}" 
+                   sh "salt ${map.UAT_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
+                   sh "salt ${map.UAT_IP1} cmd.run '${map.ROLLBACK_COMMAND}'"
+            }
+            if (params.ENV == "prod") {
                    echo "deploy ${ENV} ${map.PROD_IP1}" 
                    sh "salt ${map.PROD_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
                    sh "salt ${map.PROD_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
+            }
+            if (params.ENV == "rollback-prod") {
+                   echo "deploy ${ENV} ${map.PROD_IP1}" 
+                   sh "salt ${map.PROD_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
+                   sh "salt ${map.PROD_IP1} cmd.run '${map.ROLLBACK_COMMAND}'"
             }
         }
             }
@@ -124,25 +134,15 @@ pipeline {
                    echo "${map.TEST_IP1}：获取服务最后100行日志"
                    sh "salt ${map.TEST_IP1} cmd.run 'tail -n100 ${map.APP_LOG}'"
             }
-            if (params.ENV == "uat") {
-                   echo "deploy ${ENV} ${map.UAT_IP2}" 
-                   sh "salt ${map.UAT_IP2} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
-                   sh "salt ${map.UAT_IP2} cmd.run '${map.DEPLOY_COMMAND}'"
+            if (params.ENV == "uat" || params.ENV == "rollback-uat") {
+               sh "sleep 5s"
+               echo "${map.UAT_IP1}：获取服务最后100行日志"
+               sh "salt ${map.UAT_IP1} cmd.run 'tail -n100 ${map.APP_LOG}'"
             }
-            if (params.ENV == "rollback-uat") {
-                   echo "deploy ${ENV} ${map.UAT_IP2}" 
-                   sh "salt ${map.UAT_IP2} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
-                   sh "salt ${map.UAT_IP2} cmd.run '${map.ROLLBACK_COMMAND}'"
-            }
-            if (params.ENV == "prod") {
-                   echo "deploy ${ENV} ${map.PROD_IP2}" 
-                   sh "salt ${map.PROD_IP2} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
-                   sh "salt ${map.PROD_IP2} cmd.run '${map.DEPLOY_COMMAND}'"
-            }
-            if (params.ENV == "rollback-prod") {
-                   echo "deploy ${ENV} ${map.PROD_IP2}" 
-                   sh "salt ${map.PROD_IP2} cp.get_file salt://${JOB_NAME}/${map.WAR_NAME} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
-                   sh "salt ${map.PROD_IP2} cmd.run '${map.ROLLBACK_COMMAND}'"
+            if (params.ENV == "prod" || params.ENV == "rollback-prod") {
+               sh "sleep 5s"
+               echo "${map.PROD_IP1}：获取服务最后100行日志"
+               sh "salt ${map.PROD_IP1} cmd.run 'tail -n100 ${map.APP_LOG}'"
             }
             }
         }
