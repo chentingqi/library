@@ -24,6 +24,16 @@ pipeline {
         name: 'ENV',
         choices: ['uat','prod','rollback-uat','rollback-prod']
     )
+    choice(
+        description: '上线版本号（stable,uat,prod,rollback）',
+        name: 'PROJECT_VERSION',
+        choices: ['','3.1.79','3.1.80','3.1.81','3.1.82',,'3.1.83','3.1.84','3.1.85','3.1.86','3.1.87','3.1.88','3.1.89','3.1.90','3.1.91','3.1.92','3.1.93','3.1.94','3.1.95','3.1.96','3.1.97','3.1.98','3.1.99','test111','test222','uat111']
+    )
+    choice(
+        description: '版本补丁（stable,uat,prod,rollback）',
+        name: 'PROJECT_PATCH',
+        choices: ['','001','002','003','004','005','hotfix01','hotfix02','hotfix03']
+    )
     }
     stages{
         stage('拉取制品'){
