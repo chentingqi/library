@@ -145,6 +145,7 @@ pipeline {
     post {
         always {
             script{
+                sh "echo '${examples_var1} 发布项目：${JOB_NAME} 发布环境：${ENV} 发布版本：${PROJECT_VERSION}.${PROJECT_PATCH} 第${BUILD_NUMBER}次构建' >>/data/packages/version_list.txt"
                 println("always")
             }
             emailext attachmentsPattern: 'api-test/target/cucumber.html', body: '''
