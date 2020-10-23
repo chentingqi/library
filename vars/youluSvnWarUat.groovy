@@ -336,6 +336,7 @@ pipeline {
                            environment name: 'ENV', value: 'rollback-prod' 
             } }
             steps{
+            echo "当前时间是：${examples_var1}"
             sh "echo 进行API自动化测试"
             sh "rm -rf api-test"
             sh "cp /data/build-devops/api-test.sh $workspace"
