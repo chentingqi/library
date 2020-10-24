@@ -380,7 +380,7 @@ pipeline {
 				script {
 					json_file = "${env.WORKSPACE}/changelist.txt"
 					file_contents = readFile json_file
-					sh "echo '${examples_var1} 发布项目：${JOB_NAME} 发布环境：${ENV} 发布版本：${PROJECT_VERSION}.${PROJECT_PATCH} 第${BUILD_NUMBER}次构建 ${file_contents}' >>/data/packages/version_list.txt"
+					sh "echo '${examples_var1} 发布项目：${JOB_NAME} 发布环境：${ENV} 发布版本：${PROJECT_VERSION}.${PROJECT_PATCH} 第${BUILD_NUMBER}次构建\n${file_contents}' >>/data/packages/version_list.txt"
 					println file_contents
 					
 				}
