@@ -97,12 +97,12 @@ pipeline {
                          if (params.ENV == "uat" || params.ENV == "rollback-uat") {
                                 print("网关改配节点${ENV}")
                                 tools.PrintMes("网关改配节点${ENV}",'green')
-                                editUatUserGateway.editUatUserGateway("UAT_IP1")
+                                editUatUserGateway.activitycenter("UAT_IP1")
                         }
                         if (params.ENV == "prod" || params.ENV == "rollback-prod") {
                                 print("网关改配节点${ENV}")
                                 tools.PrintMes("网关改配节点${ENV}",'green')
-                                editProdUserGateway.editProdUserGateway("PROD_IP1")
+                                editProdUserGateway.activitycenter("PROD_IP1")
                         }
                   }
 
