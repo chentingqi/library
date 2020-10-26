@@ -1,0 +1,548 @@
+#!groovy
+
+@Library('library') _
+
+def tools = new org.devops.tools()
+def codePull = new org.devops.codePull()
+def codeScan = new org.devops.codeScan()
+def unitTest = new org.devops.unitTest()
+def codeBuild = new org.devops.codeBuild()
+def changeSlb = new org.devops.changeSlb()
+def deployService = new org.devops.deployService()
+def logCheck = new org.devops.logCheck()
+def serviceCheck = new org.devops.serviceCheck()
+def nexusPush = new org.devops.nexusPush()
+
+
+pipeline {
+    agent { node {  label "master"   //指定运行节点的标签或者名称
+            }
+    }
+
+    options {
+        timestamps()  //日志会有时间
+        skipDefaultCheckout()  //删除隐式checkout scm语句
+        disableConcurrentBuilds() //禁止并行
+        buildDiscarder(logRotator(numToKeepStr: '5')) 
+        timeout(time: 1, unit: 'HOURS')  //流水线超时设置1h
+
+    }
+    environment {
+        examples_var1 = sh(script: 'echo "当前的时间是: `date`"', returnStdout: true).trim()
+        UAT_IP1= "${UAT_IP1}"
+        UAT_IP2= "${UAT_IP2}"
+        PROD_IP1= "${PROD_IP1}"
+        PROD_IP2= "${PROD_IP2}"
+        MAVEN_BUILD_COMMAND= "/data/maven/apache-maven-3.6.2/bin/mvn  -Dmaven.repo.local=/data/.repository clean package -U -Dmaven.test.skip=true"
+        WAR_NAME= "${APP_lower_NAME}.war"
+        DEPLOY_DIR= "/data/packages"
+        DEPLOY_COMMAND= "sh /data/packages/deploy_service.sh ${TOMCAT_NAME} ${APP_lower_NAME}"
+        ROLLBACK_COMMAND= "sh /data/packages/rollback_service.sh ${TOMCAT_NAME} ${APP_lower_NAME} ${PROJECT_VERSION}"
+        APP_LOG= "/data/${TOMCAT_NAME}/logs/catalina.out"
+        SERVICE_NAME= "${APP_lower_NAME}"
+        EDIT_GATEWAT1= "sh /data/GATEWAY/user_edit_fgateway.sh es.url 172.31.129.84 8350 extensionsystem"
+        EDIT_GATEWAT2= "sh /data/GATEWAY/user_edit_fgateway.sh es.url 172.31.129.79 8350 extensionsystem"
+        EDIT_GATEWAT_ALL= "sh /data/GATEWAY/user_edit_fgateway.sh es.url 172.31.129.79 172.31.129.84 8350 extensionsystem"
+        NEXUS_NAME= "${APP_NAME}"
+        TEST_GIT= "${API_TEST_GITURL}"
+        API_HOST= "${API_HOST}"
+        DB_HOST="${DB_HOST}"
+        EMAILLIST= "cjt@youlu.com"
+    }
+    
+    parameters {
+    choice(
+        description: '选择部署环境',
+        name: 'ENV',
+        choices: ['uat','prod','rollback-uat','rollback-prod']
+    )
+    choice(
+        description: '上线版本号（stable,uat,prod,rollback）',
+        name: 'PROJECT_VERSION',
+        choices: ['','3.1.79','3.1.80','3.1.81','3.1.82',,'3.1.83','3.1.84','3.1.85','3.1.86','3.1.87','3.1.88','3.1.89','3.1.90','3.1.91','3.1.92','3.1.93','3.1.94','3.1.95','3.1.96','3.1.97','3.1.98','3.1.99','test111','test222','uat111']
+    )
+    choice(
+        description: '版本补丁（stable,uat,prod,rollback）',
+        name: 'PROJECT_PATCH',
+        choices: ['','001','002','003','004','005','hotfix01','hotfix02','hotfix03']
+    )
+    }
+    stages{
+        stage('拉取制品'){
+            when { 
+                anyOf { environment name: 'ENV', value: 'uat' ; 
+                        environment name: 'ENV', value: 'prod' ; 
+                        environment name: 'ENV', value: 'rollback-test' ; 
+                        environment name: 'ENV', value: 'rollback-uat' ; 
+                        environment name: 'ENV', value: 'rollback-prod' 
+                      } 
+                }
+            steps {
+            script {
+            if (params.PROJECT_VERSION) {
+            checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', excludedRegions: '', excludedRevprop: '', excludedUsers: '', filterChangelog: false, ignoreDirPropChanges: false, includedRegions: '', locations: [[cancelProcessOnExternalsFail: true, credentialsId: 'chenjingtao-svn', depthOption: 'infinity', ignoreExternalsOption: true, local: '.', remote: "http://171.15.16.189:11080/svn/youlu/MicroService/${PROJECT_VERSION}/${NEXUS_NAME}/${PROJECT_PATCH}"]], quietOperation: true, workspaceUpdater: [$class: 'UpdateUpdater']])
+            }
+            }
+            }
+        }
+        stage('网关改配节点1'){
+            when { anyOf { environment name: 'ENV', value: 'uat' ;
+                           environment name: 'ENV', value: 'prod' ; 
+                           environment name: 'ENV', value: 'rollback-uat' ; 
+                           environment name: 'ENV', value: 'rollback-prod' 
+            } }
+            steps {
+                  sh "${EDIT_GATEWAT1}"
+            
+        }
+        }
+        stage('部署节点1'){
+            when { 
+                anyOf { environment name: 'ENV', value: 'dev' ; 
+                        environment name: 'ENV', value: 'test' ; 
+                        environment name: 'ENV', value: 'uat' ; 
+                        environment name: 'ENV', value: 'prod' ; 
+                        environment name: 'ENV', value: 'rollback-test' ; 
+                        environment name: 'ENV', value: 'rollback-uat' ; 
+                        environment name: 'ENV', value: 'rollback-prod' 
+                      } 
+                }
+            steps {
+            script {
+            
+            if (params.ENV == "dev") {
+                   echo "deploy ${ENV} ${DEV_IP1}" 
+                   sh "salt ${DEV_IP1} cp.get_file salt://${JOB_NAME}/${WAR} ${DEPLOY_DIR}/${WAR_NAME}"
+                   sh "salt ${DEV_IP1} cmd.run '${DEPLOY_COMMAND}'"
+            }
+            if (params.ENV == "test" || params.ENV == "rollback-test") {
+                   echo "deploy ${ENV} ${TEST_IP1}" 
+                   sh "salt ${TEST_IP1} cp.get_file salt://${JOB_NAME}/${WAR} ${DEPLOY_DIR}/${WAR_NAME}"
+                   sh "salt ${TEST_IP1} cmd.run '${DEPLOY_COMMAND}'"
+            }
+            if (params.ENV == "uat") {
+                   echo "deploy ${ENV} ${UAT_IP1}" 
+                   sh "salt ${UAT_IP1} cp.get_file salt://${JOB_NAME}/${WAR_NAME} ${DEPLOY_DIR}/${WAR_NAME}"
+                   sh "salt ${UAT_IP1} cmd.run '${DEPLOY_COMMAND}'"
+            }
+            if (params.ENV == "rollback-uat") {
+                   echo "deploy ${ENV} ${UAT_IP1}" 
+                   sh "salt ${UAT_IP1} cp.get_file salt://${JOB_NAME}/${WAR_NAME} ${DEPLOY_DIR}/${WAR_NAME}"
+                   sh "salt ${UAT_IP1} cmd.run '${ROLLBACK_COMMAND}'"
+            }
+            if (params.ENV == "prod") {
+                   echo "deploy ${ENV} ${PROD_IP1}" 
+                   sh "salt ${PROD_IP1} cp.get_file salt://${JOB_NAME}/${WAR_NAME} ${DEPLOY_DIR}/${WAR_NAME}"
+                   sh "salt ${PROD_IP1} cmd.run '${DEPLOY_COMMAND}'"
+            }
+            if (params.ENV == "rollback-prod") {
+                   echo "deploy ${ENV} ${PROD_IP1}" 
+                   sh "salt ${PROD_IP1} cp.get_file salt://${JOB_NAME}/${WAR_NAME} ${DEPLOY_DIR}/${WAR_NAME}"
+                   sh "salt ${PROD_IP1} cmd.run '${ROLLBACK_COMMAND}'"
+            }
+        }
+            }
+        }
+        stage('日志输出1'){
+            when { 
+                anyOf { environment name: 'ENV', value: 'dev' ; 
+                        environment name: 'ENV', value: 'test' ; 
+                        environment name: 'ENV', value: 'uat' ; 
+                        environment name: 'ENV', value: 'prod' ; 
+                        environment name: 'ENV', value: 'rollback-test' ; 
+                        environment name: 'ENV', value: 'rollback-uat' ; 
+                        environment name: 'ENV', value: 'rollback-prod' 
+                      } 
+                }
+            steps {
+            script {
+            if (params.ENV == "dev") {
+               sh "sleep 5s"
+                   echo "${DEV_IP1}：获取服务最后100行日志"
+                   sh "salt ${DEV_IP1} cmd.run 'tail -n100 ${APP_LOG}'"
+            }
+            if (params.ENV == "test" || params.ENV == "rollback-test") {
+               sh "sleep 5s"
+                   echo "${TEST_IP1}：获取服务最后100行日志"
+                   sh "salt ${TEST_IP1} cmd.run 'tail -n100 ${APP_LOG}'"
+            }
+            if (params.ENV == "uat" || params.ENV == "rollback-uat") {
+               sh "sleep 5s"
+               echo "${UAT_IP1}：获取服务最后100行日志"
+               sh "salt ${UAT_IP1} cmd.run 'tail -n100 ${APP_LOG}'"
+            }
+            if (params.ENV == "prod" || params.ENV == "rollback-prod") {
+               sh "sleep 5s"
+               echo "${PROD_IP1}：获取服务最后100行日志"
+               sh "salt ${PROD_IP1} cmd.run 'tail -n100 ${APP_LOG}'"
+            }
+            }
+        }
+        }
+        stage('服务检查1'){
+            when { 
+                anyOf { environment name: 'ENV', value: 'dev' ; 
+                        environment name: 'ENV', value: 'test' ; 
+                        environment name: 'ENV', value: 'uat' ; 
+                        environment name: 'ENV', value: 'prod' ; 
+                        environment name: 'ENV', value: 'rollback-test' ; 
+                        environment name: 'ENV', value: 'rollback-uat' ; 
+                        environment name: 'ENV', value: 'rollback-prod' 
+                      } 
+                }
+            steps {
+            script {
+            if (params.ENV == "dev") {
+               sh "sleep 5s"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
+               sh "sed -i 's/jarname/${SERVICE_NAME}/g'  service_check.sh"
+                   echo "${DEV_IP1}：查看服务进程是否存在"
+                   sh "salt ${DEV_IP1} cp.get_file salt://${JOB_NAME}/service_check.sh ${DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${DEV_IP1} cmd.run 'sh ${DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+            }
+            if (params.ENV == "test" || params.ENV == "rollback-test") {
+               sh "sleep 5s"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
+               sh "sed -i 's/jarname/${SERVICE_NAME}/g'  service_check.sh"
+                   echo "${TEST_IP1}：查看服务进程是否存在"
+                   sh "salt ${TEST_IP1} cp.get_file salt://${JOB_NAME}/service_check.sh ${DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${TEST_IP1} cmd.run 'sh ${DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+            }
+            if (params.ENV == "uat" || params.ENV == "rollback-uat") {
+               sh "sleep 5s"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
+               sh "sed -i 's/jarname/${SERVICE_NAME}/g'  service_check.sh"
+                   echo "${UAT_IP1}：查看服务进程是否存在"
+                   sh "salt ${UAT_IP1} cp.get_file salt://${JOB_NAME}/service_check.sh ${DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${UAT_IP1} cmd.run 'sh ${DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+            }
+            if (params.ENV == "prod" || params.ENV == "rollback-prod") {
+               sh "sleep 5s"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
+               sh "sed -i 's/jarname/${SERVICE_NAME}/g'  service_check.sh"
+                   echo "${PROD_IP1}：查看服务进程是否存在"
+                   sh "salt ${PROD_IP1} cp.get_file salt://${JOB_NAME}/service_check.sh ${DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${PROD_IP1} cmd.run 'sh ${DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+            }
+            }
+            }
+        }
+        stage('网关改配节点2'){
+            when { anyOf { environment name: 'ENV', value: 'uat' ;
+                           environment name: 'ENV', value: 'prod' ; 
+                           environment name: 'ENV', value: 'rollback-uat' ; 
+                           environment name: 'ENV', value: 'rollback-prod' 
+                           } }
+            steps {
+                  sh "${EDIT_GATEWAT2}"
+            }
+        }
+        stage('部署节点2'){
+            when { 
+                anyOf { environment name: 'ENV', value: 'uat' ; 
+                        environment name: 'ENV', value: 'prod' ;  
+                        environment name: 'ENV', value: 'rollback-uat' ; 
+                        environment name: 'ENV', value: 'rollback-prod' 
+                      } 
+                }
+            steps {
+            script {
+            
+            if (params.ENV == "dev") {
+                   echo "deploy ${ENV} ${DEV_IP2}" 
+                   sh "salt ${DEV_IP2} cp.get_file salt://${JOB_NAME}/${WAR} ${DEPLOY_DIR}/${WAR_NAME}"
+                   sh "salt ${DEV_IP2} cmd.run '${DEPLOY_COMMAND}'"
+            }
+            if (params.ENV == "test" || params.ENV == "rollback-test") {
+                   echo "deploy ${ENV} ${TEST_IP2}" 
+                   sh "salt ${TEST_IP2} cp.get_file salt://${JOB_NAME}/${WAR} ${DEPLOY_DIR}/${WAR_NAME}"
+                   sh "salt ${TEST_IP2} cmd.run '${DEPLOY_COMMAND}'"
+            }
+            if (params.ENV == "uat") {
+                   echo "deploy ${ENV} ${UAT_IP2}" 
+                   sh "salt ${UAT_IP2} cp.get_file salt://${JOB_NAME}/${WAR_NAME} ${DEPLOY_DIR}/${WAR_NAME}"
+                   sh "salt ${UAT_IP2} cmd.run '${DEPLOY_COMMAND}'"
+            }
+            if (params.ENV == "rollback-uat") {
+                   echo "deploy ${ENV} ${UAT_IP2}" 
+                   sh "salt ${UAT_IP2} cp.get_file salt://${JOB_NAME}/${WAR_NAME} ${DEPLOY_DIR}/${WAR_NAME}"
+                   sh "salt ${UAT_IP2} cmd.run '${ROLLBACK_COMMAND}'"
+            }
+            if (params.ENV == "prod") {
+                   echo "deploy ${ENV} ${PROD_IP2}" 
+                   sh "salt ${PROD_IP2} cp.get_file salt://${JOB_NAME}/${WAR_NAME} ${DEPLOY_DIR}/${WAR_NAME}"
+                   sh "salt ${PROD_IP2} cmd.run '${DEPLOY_COMMAND}'"
+            }
+            if (params.ENV == "rollback-prod") {
+                   echo "deploy ${ENV} ${PROD_IP2}" 
+                   sh "salt ${PROD_IP2} cp.get_file salt://${JOB_NAME}/${WAR_NAME} ${DEPLOY_DIR}/${WAR_NAME}"
+                   sh "salt ${PROD_IP2} cmd.run '${ROLLBACK_COMMAND}'"
+            }
+        }
+            }
+        }
+        stage('日志输出2'){
+            when { 
+                anyOf { environment name: 'ENV', value: 'uat' ; 
+                        environment name: 'ENV', value: 'prod' ;  
+                        environment name: 'ENV', value: 'rollback-uat' ; 
+                        environment name: 'ENV', value: 'rollback-prod' 
+                      } 
+                }
+            steps {
+            script {
+            if (params.ENV == "dev") {
+               sh "sleep 5s"
+                   echo "${DEV_IP2}：获取服务最后100行日志"
+                   sh "salt ${DEV_IP2} cmd.run 'tail -n100 ${APP_LOG}'"
+            }
+            if (params.ENV == "test" || params.ENV == "rollback-test") {
+               sh "sleep 5s"
+                   echo "${TEST_IP2}：获取服务最后100行日志"
+                   sh "salt ${TEST_IP2} cmd.run 'tail -n100 ${APP_LOG}'"
+            }
+            if (params.ENV == "uat" || params.ENV == "rollback-uat") {
+               sh "sleep 5s"
+               echo "${UAT_IP2}：获取服务最后100行日志"
+               sh "salt ${UAT_IP2} cmd.run 'tail -n100 ${APP_LOG}'"
+            }
+            if (params.ENV == "prod" || params.ENV == "rollback-prod") {
+               sh "sleep 5s"
+               echo "${PROD_IP2}：获取服务最后100行日志"
+               sh "salt ${PROD_IP2} cmd.run 'tail -n100 ${APP_LOG}'"
+            }
+            }
+        }
+        }
+        stage('服务检查2'){
+            when { 
+                anyOf { environment name: 'ENV', value: 'uat' ; 
+                        environment name: 'ENV', value: 'prod' ; 
+                        environment name: 'ENV', value: 'rollback-uat' ; 
+                        environment name: 'ENV', value: 'rollback-prod' 
+                      } 
+                }
+            steps {
+            script {
+            if (params.ENV == "dev") {
+               sh "sleep 5s"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
+               sh "sed -i 's/jarname/${SERVICE_NAME}/g'  service_check.sh"
+                   echo "${DEV_IP2}：查看服务进程是否存在"
+                   sh "salt ${DEV_IP2} cp.get_file salt://${JOB_NAME}/service_check.sh ${DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${DEV_IP2} cmd.run 'sh ${DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+            }
+            if (params.ENV == "test" || params.ENV == "rollback-test") {
+               sh "sleep 5s"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
+               sh "sed -i 's/jarname/${SERVICE_NAME}/g'  service_check.sh"
+                   echo "${TEST_IP2}：查看服务进程是否存在"
+                   sh "salt ${TEST_IP2} cp.get_file salt://${JOB_NAME}/service_check.sh ${DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${TEST_IP2} cmd.run 'sh ${DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+            }
+            if (params.ENV == "uat" || params.ENV == "rollback-uat") {
+               sh "sleep 5s"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
+               sh "sed -i 's/jarname/${SERVICE_NAME}/g'  service_check.sh"
+                   echo "${UAT_IP2}：查看服务进程是否存在"
+                   sh "salt ${UAT_IP2} cp.get_file salt://${JOB_NAME}/service_check.sh ${DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${UAT_IP2} cmd.run 'sh ${DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+            }
+            if (params.ENV == "prod" || params.ENV == "rollback-prod") {
+               sh "sleep 5s"
+               sh "cp /data/build-devops/service_check.sh $workspace/"
+               sh "sed -i 's/jarname/${SERVICE_NAME}/g'  service_check.sh"
+                   echo "${PROD_IP2}：查看服务进程是否存在"
+                   sh "salt ${PROD_IP2} cp.get_file salt://${JOB_NAME}/service_check.sh ${DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "salt ${PROD_IP2} cmd.run 'sh ${DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+            }
+            }
+            }
+        }
+        stage('网关改配双节点'){
+            when { anyOf { environment name: 'ENV', value: 'uat' ;
+                           environment name: 'ENV', value: 'prod' ; 
+                           environment name: 'ENV', value: 'rollback-uat' ; 
+                           environment name: 'ENV', value: 'rollback-prod'  } }
+            steps {
+                  sh "${EDIT_GATEWAT_ALL}"
+            }
+        }
+        stage('上传SVN制品库'){
+            when { 
+                anyOf { environment name: 'ENV', value: 'stable' 
+                      } 
+            }
+            steps{
+            sh "cp /data/build-devops/svn/svn-upload.sh $workspace"
+            sh "sed -i 's/app_version/${PROJECT_VERSION}/g' svn-upload.sh"
+            sh "sed -i 's/app_patch/${PROJECT_PATCH}/g' svn-upload.sh"
+            sh "sed -i 's/nexus_name/${NEXUS_NAME}/g' svn-upload.sh"
+            sh "sed -i 's#app_package#${WAR}#g' svn-upload.sh"
+            sh "sh svn-upload.sh"
+            }
+            }
+
+        stage('API测试'){
+            when { anyOf { environment name: 'ENV', value: 'test' ;
+                           environment name: 'ENV', value: 'uat' ;
+                           environment name: 'ENV', value: 'prod' ; 
+                           environment name: 'ENV', value: 'rollback-test' ;
+                           environment name: 'ENV', value: 'rollback-uat' ;
+                           environment name: 'ENV', value: 'rollback-prod' 
+            } }
+            steps{
+            //sh "echo '${examples_var1} 发布项目：${JOB_NAME} 发布环境：${ENV} 发布版本：${PROJECT_VERSION}.${PROJECT_PATCH} 第${BUILD_NUMBER}次构建' >>/data/packages/version_list.txt"
+            sh "echo 进行API自动化测试"
+            sh "rm -rf api-test"
+            sh "cp /data/build-devops/api-test.sh $workspace"
+            sh "sed -i 's#git_url#${TEST_GIT}#g' api-test.sh"
+            //git branch: 'master', credentialsId: "chenjingtao-git", url: "${TEST_GIT}"
+            sh "sh api-test.sh"
+            }
+        }
+        stage("变更列表") {
+            when { 
+                anyOf { environment name: 'ENV', value: 'uat' ; 
+                        environment name: 'ENV', value: 'prod'
+                        
+                      } 
+                }
+			steps{
+				script {
+					json_file = "${env.WORKSPACE}/changelist.txt"
+					file_contents = readFile json_file
+					sh "echo '${examples_var1} 发布项目：${JOB_NAME} 发布环境：${ENV} 发布版本：${PROJECT_VERSION}.${PROJECT_PATCH} 第${BUILD_NUMBER}次构建\n${file_contents}' >>/data/packages/version_list.txt"
+					sh "cp /data/packages/version_list.txt /data/apache-tomcat-9.0.24/webapps/version/"
+					println file_contents
+					
+				}
+			}
+		}
+
+    }
+    //构建后操作
+    post {
+        always {
+            script{
+                println("always")
+            }
+            emailext attachmentsPattern: 'api-test/target/cucumber.html', body: '''
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <meta charset="UTF-8">
+        <title>${ENV, var="JOB_NAME"}-第${BUILD_NUMBER}次构建日志</title>
+        </head>
+ 
+        <body leftmargin="8" marginwidth="0" topmargin="8" marginheight="4"
+        offset="0">
+        <table width="95%" cellpadding="0" cellspacing="0"
+        style="font-size: 11pt; font-family: Tahoma, Arial, Helvetica, sans-serif">
+        <tr>
+            <td>(本邮件是程序自动下发的，请勿回复！)</td>
+        </tr>
+        <tr>
+            <td><h2>
+                    <font color="#00FF00">构建结果 - ${BUILD_STATUS}</font>
+                </h2></td>
+        </tr>
+        <tr>
+            <td><br />
+            <b><font color="#0B610B">构建信息</font></b>
+            <hr size="2" width="100%" align="center" /></td>
+        </tr>
+        <tr>
+            <td>
+                <ul>
+                    <li>项目名称&nbsp;：&nbsp;${PROJECT_NAME}</li>
+                    <li>构建编号&nbsp;：&nbsp;第${BUILD_NUMBER}次构建</li>
+                    <li>触发原因：&nbsp;${CAUSE}</li>
+                    <li>流水线Url&nbsp;：&nbsp;<a href="${JENKINS_URL}blue/organizations/jenkins/${JOB_NAME}/detail/${JOB_NAME}/${BUILD_NUMBER}/pipeline">${JENKINS_URL}blue/organizations/jenkins/${JOB_NAME}/detail/${JOB_NAME}/${BUILD_NUMBER}/pipeline</a></li>
+                    <li>构建&nbsp;&nbsp;Url&nbsp;：&nbsp;<a href="${BUILD_URL}">${BUILD_URL}</a></li>
+                    <li>项目&nbsp;&nbsp;Url&nbsp;：&nbsp;<a href="${PROJECT_URL}">${PROJECT_URL}</a></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><br />
+            <b><font color="#0B610B">部署信息</font></b>
+            <hr size="2" width="100%" align="center" /></td>
+        </tr>
+        <tr>
+            <td>
+                <ul>
+                    <li>部署环境&nbsp;：&nbsp;${ENV}</li>
+                    <li>代码版本&nbsp;：&nbsp;${SVN_BRANCH_VERSION}</li>
+                    <li>制品版本&nbsp;：&nbsp;${PROJECT_VERSION}.${PROJECT_PATCH}</li>
+                    <li>代码扫描地址：&nbsp;<a href="http://192.168.10.83:8081/dashboard?id=${JOB_NAME}">http://192.168.10.83:8081/dashboard?id=${JOB_NAME}</a></li>
+                    <li>制品库地址：&nbsp;<a href="http://192.168.11.247/svn/youlu/MicroService/${DEPLOY_VERSION}/${NEXUS_NAME}/${DEPLOY_PATCH}">http://192.168.11.247/svn/youlu/MicroService/${PROJECT_VERSION}/${APP_NAME}/${PROJECT_PATCH}</a></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><b><font color="#0B610B">Changes Since Last
+                        Successful Build:</font></b>
+            <hr size="2" width="100%" align="center" /></td>
+        </tr>
+        <tr>
+            <td>
+                <ul>
+                    <li>历史变更记录 : <a href="${PROJECT_URL}changes">${PROJECT_URL}changes</a></li>
+                </ul> ${CHANGES_SINCE_LAST_SUCCESS,reverse=true, format="Changes for Build #%n:<br />%c<br />",showPaths=true,changesFormat="<pre>[%a]<br />%m</pre>",pathFormat="&nbsp;&nbsp;&nbsp;&nbsp;%p"}
+            </td>
+        </tr>
+        <tr>
+            <td><b>Failed Test Results</b>
+            <hr size="2" width="100%" align="center" /></td>
+        </tr>
+        <tr>
+            <td><pre
+                    style="font-size: 11pt; font-family: Tahoma, Arial, Helvetica, sans-serif">$FAILED_TESTS</pre>
+                <br /></td>
+        </tr>
+        <tr>
+            <td><b><font color="#0B610B">构建日志 (最后 100行):</font></b>
+            <hr size="2" width="100%" align="center" /></td>
+        </tr>
+        <!-- <tr>
+            <td>Test Logs (if test has ran): <a
+                href="${PROJECT_URL}ws/TestResult/archive_logs/Log-Build-${BUILD_NUMBER}.zip">${PROJECT_URL}/ws/TestResult/archive_logs/Log-Build-${BUILD_NUMBER}.zip</a>
+                <br />
+            <br />
+            </td>
+        </tr> -->
+        <tr>
+            <td><textarea cols="80" rows="30" readonly="readonly"
+                    style="font-family: Courier New">${BUILD_LOG, maxLines=100}</textarea>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+
+
+    ''', subject: "'${ENV}环境：${env.JOB_NAME} [${env.BUILD_NUMBER}]' 构建完成", to: "${EMAILLIST}", from: 'chenjingtao@jiaoyu361.com'
+
+            
+        }
+
+        success {
+            script{
+                currentBuild.description = "\n ${ENV}-${PROJECT_VERSION}-${PROJECT_PATCH}构建成功!" 
+            }
+        }
+
+        failure {
+            script{
+                currentBuild.description = "\n ${ENV}-${PROJECT_VERSION}-${PROJECT_PATCH}构建失败!" 
+            }
+        }
+
+        aborted {
+            script{
+                currentBuild.description = "\n ${ENV}-${PROJECT_VERSION}-${PROJECT_PATCH}构建取消!" 
+            }
+        }
+    }
+}
