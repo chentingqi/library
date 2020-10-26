@@ -44,7 +44,7 @@ pipeline {
         EDIT_GATEWAT2= "sh /data/GATEWAY/user_edit_fgateway.sh es.url 172.31.129.79 8350 extensionsystem"
         EDIT_GATEWAT_ALL= "sh /data/GATEWAY/user_edit_fgateway.sh es.url 172.31.129.79 172.31.129.84 8350 extensionsystem"
         NEXUS_NAME= "${APP_NAME}"
-        TEST_GIT= "${TEST_GIT}"
+        TEST_GIT= "${API_TEST_GITURL}"
         API_HOST= "${API_HOST}"
         DB_HOST="${DB_HOST}"
         EMAILLIST= "cjt@youlu.com"
