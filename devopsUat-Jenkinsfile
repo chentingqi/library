@@ -97,11 +97,13 @@ pipeline {
                          if (params.ENV == "uat" || params.ENV == "rollback-uat") {
                                 print("网关改配节点${ENV}")
                                 tools.PrintMes("网关改配节点${ENV}",'green')
+                                echo "${APP_lower_NAME},{UAT_IP1}"
                                 editUatUserGateway.editUatUserGateway("${APP_lower_NAME}","{UAT_IP1}")
                         }
                         if (params.ENV == "prod" || params.ENV == "rollback-prod") {
                                 print("网关改配节点${ENV}")
                                 tools.PrintMes("网关改配节点${ENV}",'green')
+                                echo "${APP_lower_NAME},{PROD_IP1}"
                                 editProdUserGateway.editUatUserGateway("${APP_lower_NAME}","${PROD_IP1}")
                         }
                   }
@@ -259,7 +261,6 @@ pipeline {
                                 editUatUserGateway.editUatUserGateway("${APP_lower_NAME}","{PROD_IP2}")
                         }
                   }
-
             
         }
         }
