@@ -94,17 +94,14 @@ pipeline {
             } }
             steps {
                   script{
-                         if (params.ENV == "uat" || params.ENV == "rollback-uat") {
-                                print("网关改配节点${ENV}")
-                                tools.PrintMes("网关改配节点${ENV}",'green')
-                                echo "${APP_lower_NAME},${UAT_IP1}"
-                                editUatUserGateway.editUatUserGateway("${APP_lower_NAME}","${UAT_IP1}")
+                        if (params.ENV == "uat" || params.ENV == "rollback-uat") {
+                                tools.PrintMes("网关改配节点${ENV}: ${UAT_IP2}",'green')
+                                editUatUserGateway.editUatUserGateway("${APP_lower_NAME}","IP2")
                         }
                         if (params.ENV == "prod" || params.ENV == "rollback-prod") {
                                 print("网关改配节点${ENV}")
-                                tools.PrintMes("网关改配节点${ENV}",'green')
-                                echo "${APP_lower_NAME},${PROD_IP1}"
-                                editProdUserGateway.editUatUserGateway("${APP_lower_NAME}","${PROD_IP1}")
+                                tools.PrintMes("网关改配节点${ENV}: ${PROD_IP2}",'green')
+                                editUatUserGateway.editUatUserGateway("${APP_lower_NAME}","IP2")
                         }
                   }
 
@@ -250,17 +247,14 @@ pipeline {
             } }
             steps {
                   script{
-                         if (params.ENV == "uat" || params.ENV == "rollback-uat") {
-                                print("网关改配节点${ENV}")
-                                tools.PrintMes("网关改配节点${ENV}",'green')
-                                echo "${APP_lower_NAME},${UAT_IP2}"
-                                editUatUserGateway.editUatUserGateway("${APP_lower_NAME}","${UAT_IP2}")
+                        if (params.ENV == "uat" || params.ENV == "rollback-uat") {
+                                tools.PrintMes("网关改配节点${ENV}: ${UAT_IP1}",'green')
+                                editUatUserGateway.editUatUserGateway("${APP_lower_NAME}","IP1")
                         }
                         if (params.ENV == "prod" || params.ENV == "rollback-prod") {
                                 print("网关改配节点${ENV}")
-                                tools.PrintMes("网关改配节点${ENV}",'green')
-                                echo "${APP_lower_NAME},${PROD_IP2}"
-                                editUatUserGateway.editUatUserGateway("${APP_lower_NAME}","${PROD_IP2}")
+                                tools.PrintMes("网关改配节点${ENV}: ${PROD_IP1}",'green')
+                                editUatUserGateway.editUatUserGateway("${APP_lower_NAME}","IP1")
                         }
                   }
             
@@ -397,14 +391,13 @@ pipeline {
             steps {
                   script{
                          if (params.ENV == "uat" || params.ENV == "rollback-uat") {
-                                print("网关改配节点${ENV}")
-                                tools.PrintMes("网关改配节点${ENV}",'green')
-                                editUatUserGateway.editUatUserGateway("${APP_lower_NAME}","${UAT_IP1}-${UAT_IP2}")
+                                tools.PrintMes("网关改配节点${ENV}: ${UAT_IP1},${UAT_IP2}",'green')
+                                editUatUserGateway.editUatUserGateway("${APP_lower_NAME}","IP12")
                         }
                         if (params.ENV == "prod" || params.ENV == "rollback-prod") {
                                 print("网关改配节点${ENV}")
-                                tools.PrintMes("网关改配节点${ENV}",'green')
-                                editUatUserGateway.editUatUserGateway("${APP_lower_NAME}","${PROD_IP1}-${PROD_IP2}")
+                                tools.PrintMes("网关改配节点${ENV}: ${PROD_IP1},${PROD_IP2}",'green')
+                                editUatUserGateway.editUatUserGateway("${APP_lower_NAME}","IP12")
                         }
                   }
 
