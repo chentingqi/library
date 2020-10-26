@@ -21,4 +21,9 @@ def editUatGateway(service,ip){
        if (ip == 'IP2'){sh """sh /data/GATEWAY/uat_edit_fgateway.sh uc.url 172.31.129.79 8000 usercenter"""}
        if (ip == 'IP12'){sh """sh /data/GATEWAY/uat_edit_fgateway.sh uc.url 172.31.129.79 172.31.129.84 8000 usercenter"""}
     }
+    if (service == 'paycenter'){
+       if (ip == 'IP1'){sh """sh /data/GATEWAY/uat_edit_fgateway.sh pc.url 172.31.129.84 8120 paycenter"""}
+       if (ip == 'IP2'){sh """sh /data/GATEWAY/uat_edit_fgateway.sh pc.url 172.31.129.79 8120 paycenter"""}
+       if (ip == 'IP12'){sh """sh /data/GATEWAY/uat_edit_fgateway.sh pc.url 172.31.129.79 172.31.129.84 8120 paycenter"""}
+    }
 }
