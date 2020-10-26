@@ -12,6 +12,7 @@ def deployService = new org.devops.deployService()
 def logCheck = new org.devops.logCheck()
 def serviceCheck = new org.devops.serviceCheck()
 def nexusPush = new org.devops.nexusPush()
+def editUatUserGateway = new org.devops.editUatUserGateway()
 
 
 pipeline {
@@ -92,7 +93,18 @@ pipeline {
                            environment name: 'ENV', value: 'rollback-prod' 
             } }
             steps {
-                  sh "${EDIT_GATEWAT1}"
+                  script{
+                         if (params.ENV == "uat" || params.ENV == "rollback-uat") {
+                                print("网关改配节点${ENV}")
+                                tools.PrintMes("网关改配节点${ENV}",'green')
+                                editUatUserGateway.editUatUserGateway("UAT_IP1")
+                        }
+                        if (params.ENV == "prod" || params.ENV == "rollback-prod") {
+                                print("网关改配节点${ENV}")
+                                tools.PrintMes("网关改配节点${ENV}",'green')
+                                editProdUserGateway.editProdUserGateway("PROD_IP1")
+                        }
+
             
         }
         }
