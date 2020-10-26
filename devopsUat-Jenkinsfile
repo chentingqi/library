@@ -471,7 +471,6 @@ pipeline {
             <td>
                 <ul>
                     <li>部署环境&nbsp;：&nbsp;${ENV}</li>
-                    <li>代码版本&nbsp;：&nbsp;${SVN_BRANCH_VERSION}</li>
                     <li>制品版本&nbsp;：&nbsp;${PROJECT_VERSION}.${PROJECT_PATCH}</li>
                     <li>代码扫描地址：&nbsp;<a href="http://192.168.10.83:8081/dashboard?id=${JOB_NAME}">http://192.168.10.83:8081/dashboard?id=${JOB_NAME}</a></li>
                     <li>制品库地址：&nbsp;<a href="http://192.168.11.247/svn/youlu/MicroService/${DEPLOY_VERSION}/${NEXUS_NAME}/${DEPLOY_PATCH}">http://192.168.11.247/svn/youlu/MicroService/${PROJECT_VERSION}/${APP_NAME}/${PROJECT_PATCH}</a></li>
