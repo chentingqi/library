@@ -22,21 +22,10 @@ pipeline {
     choice(
         description: '选择部署环境',
         name: 'ENV',
-        choices: ['test','stable','uat','prod','rollback-test','rollback-uat','rollback-prod']
+        choices: ['uat','prod','rollback-test','rollback-uat','rollback-prod']
     )
-    string(name: 'APP_VERSION', defaultValue: "${map.APP_VERSION}",description: '构建成功后target目录下的版本号（test）')
-    string(name: 'SVN_BRANCH_VERSION', defaultValue: "${map.SVN_BRANCH_VERSION}",description: 'SVN代码分支（test）')
-    choice(
-        description: '上线版本号（stable,uat,prod,rollback）',
-        name: 'PROJECT_VERSION',
-        choices: ['','3.1.79','3.1.80','3.1.81','3.1.82',,'3.1.83','3.1.84','3.1.85','3.1.86','3.1.87','3.1.88','3.1.89','3.1.90','3.1.91','3.1.92','3.1.93','3.1.94','3.1.95','3.1.96','3.1.97','3.1.98','3.1.99','test111','test222']
-    )
-    choice(
-        description: '版本补丁（stable,uat,prod,rollback）',
-        name: 'PROJECT_PATCH',
-        choices: ['','001','002','hotfix01']
-    )
-    string(name: 'API_HOST', defaultValue: "${map.API_HOST}",description: '接口自动化测试')
+    string(name: 'PROJECT_VERSION', defaultValue: "",description: '请输入上线版本号')
+    string(name: 'PROJECT_PATCH', defaultValue: "",description: '请输入上线版本补丁')
     }
     stages{
         stage("拉取代码") {
@@ -97,7 +86,7 @@ pipeline {
                       } 
                 }
             steps {
-            checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', excludedRegions: '', excludedRevprop: '', excludedUsers: '', filterChangelog: false, ignoreDirPropChanges: false, includedRegions: '', locations: [[cancelProcessOnExternalsFail: true, credentialsId: 'chenjingtao-svn', depthOption: 'infinity', ignoreExternalsOption: true, local: '.', remote: "http://171.15.16.189:11080/svn/youlu/MicroService/${PROJECT_VERSION}/${map.NEXUS_NAME}/${PROJECT_PATCH}"]], quietOperation: true, workspaceUpdater: [$class: 'UpdateUpdater']])
+            checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', excludedRegions: '', excludedRevprop: '', excludedUsers: '', filterChangelog: false, ignoreDirPropChanges: false, includedRegions: '', locations: [[cancelProcessOnExternalsFail: true, credentialsId: 'chenjingtao-svn', depthOption: 'infinity', ignoreExternalsOption: true, local: '.', remote: "http://171.15.16.189:11080/svn/youlu/youedian/${PROJECT_VERSION}/${map.NEXUS_NAME}/${PROJECT_PATCH}"]], quietOperation: true, workspaceUpdater: [$class: 'UpdateUpdater']])
             }
         }
         stage('网关改配节点1'){
@@ -107,7 +96,7 @@ pipeline {
                            environment name: 'ENV', value: 'rollback-prod' 
             } }
             steps {
-                  sh "${map.EDIT_GATEWAT1}"
+                  sh "echo 123"
             
         }
         }
@@ -127,23 +116,23 @@ pipeline {
             
             if (params.ENV == "dev") {
                    echo "deploy ${ENV} ${map.DEV_IP1}" 
-                   sh "scp ${map.WAR} msyoulu@${map.DEV_IP1}:${map.DEPLOY_DIR}"
-                   sh "ssh msyoulu@${map.DEV_IP1} '${map.DEPLOY_COMMAND}'"
+                   sh "scp ${map.WAR} uedian@${map.DEV_IP1}:${map.DEPLOY_DIR}"
+                   sh "ssh uedian@${map.DEV_IP1} '${map.DEPLOY_COMMAND}'"
             }
             if (params.ENV == "test" || params.ENV == "rollback-test") {
                    echo "deploy ${ENV} ${map.TEST_IP1}" 
-                   sh "scp ${map.WAR} msyoulu@${map.TEST_IP1}:${map.DEPLOY_DIR}"
-                   sh "ssh msyoulu@${map.TEST_IP1} '${map.DEPLOY_COMMAND}'"
+                   sh "scp ${map.WAR} uedian@${map.TEST_IP1}:${map.DEPLOY_DIR}"
+                   sh "ssh uedian@${map.TEST_IP1} '${map.DEPLOY_COMMAND}'"
             }
             if (params.ENV == "uat" || params.ENV == "rollback-uat") {
                    echo "deploy ${ENV} ${map.UAT_IP1}" 
-                   sh "scp ${map.WAR_NAME} msyoulu@${map.UAT_IP1}:${map.DEPLOY_DIR}"
-                   sh "ssh msyoulu@${map.UAT_IP1} '${map.DEPLOY_COMMAND}'"
+                   sh "scp ${map.WAR_NAME} uedian@${map.UAT_IP1}:${map.DEPLOY_DIR}"
+                   sh "ssh uedian@${map.UAT_IP1} '${map.DEPLOY_COMMAND}'"
             }
             if (params.ENV == "prod" || params.ENV == "rollback-prod") {
                    echo "deploy ${ENV} ${map.PROD_IP1}" 
-                   sh "scp ${map.WAR_NAME} msyoulu@${map.PROD_IP1}:${map.DEPLOY_DIR}"
-                   sh "ssh msyoulu@${map.PROD_IP1} '${map.DEPLOY_COMMAND}'"
+                   sh "scp -P 10022 ${map.WAR_NAME} uedian@${map.PROD_IP1}:${map.DEPLOY_DIR}"
+                   sh "ssh -p '10022' 'uedian@47.104.168.140' '${map.DEPLOY_COMMAND}'"
             }
         }
             }
@@ -164,22 +153,22 @@ pipeline {
             if (params.ENV == "dev") {
                sh "sleep 5s"
                    echo "${map.DEV_IP1}：获取服务最后100行日志"
-                   sh "ssh msyoulu@${map.DEV_IP1} 'tail -n100 ${map.APP_LOG}'"
+                   sh "ssh -p '10022' 'uedian@47.104.168.140' 'tail -n100 ${map.APP_LOG}'"
             }
             if (params.ENV == "test" || params.ENV == "rollback-test") {
                sh "sleep 5s"
                    echo "${map.TEST_IP1}：获取服务最后100行日志"
-                   sh "ssh msyoulu@${map.TEST_IP1} 'tail -n100 ${map.APP_LOG}'"
+                   sh "ssh uedian@${map.TEST_IP1} 'tail -n100 ${map.APP_LOG}'"
             }
             if (params.ENV == "uat" || params.ENV == "rollback-uat") {
                sh "sleep 5s"
                echo "${map.UAT_IP1}：获取服务最后100行日志"
-               sh "ssh msyoulu@${map.UAT_IP1} 'tail -n100 ${map.APP_LOG}'"
+               sh "ssh uedian@${map.UAT_IP1} 'tail -n100 ${map.APP_LOG}'"
             }
             if (params.ENV == "prod" || params.ENV == "rollback-prod") {
                sh "sleep 5s"
                echo "${map.PROD_IP1}：获取服务最后100行日志"
-               sh "ssh msyoulu@${map.PROD_IP1} 'tail -n100 ${map.APP_LOG}'"
+               sh "ssh -p '10022' 'uedian@47.104.168.140' 'tail -n100 ${map.APP_LOG}'"
             }
             }
         }
@@ -202,32 +191,32 @@ pipeline {
                sh "cp /data/build-devops/service_check.sh $workspace/"
                sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
                    echo "${map.DEV_IP1}：查看服务进程是否存在"
-                   sh "scp service_check.sh msyoulu@${map.DEV_IP1}:${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
-                   sh "ssh msyoulu@${map.DEV_IP1} 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+                   sh "scp service_check.sh uedian@${map.DEV_IP1}:${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "ssh -p '10022' 'uedian@47.104.168.140' 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
             }
             if (params.ENV == "test" || params.ENV == "rollback-test") {
                sh "sleep 5s"
                sh "cp /data/build-devops/service_check.sh $workspace/"
                sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
                    echo "${map.TEST_IP1}：查看服务进程是否存在"
-                   sh "scp service_check.sh msyoulu@${map.TEST_IP1}:${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
-                   sh "ssh msyoulu@${map.TEST_IP1} 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+                   sh "scp service_check.sh uedian@${map.TEST_IP1}:${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "ssh -p '10022' 'uedian@47.104.168.140' 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
             }
             if (params.ENV == "uat" || params.ENV == "rollback-uat") {
                sh "sleep 5s"
                sh "cp /data/build-devops/service_check.sh $workspace/"
                sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
                    echo "${map.UAT_IP1}：查看服务进程是否存在"
-                   sh "scp service_check.sh msyoulu@${map.UAT_IP1}:${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
-                   sh "ssh msyoulu@${map.UAT_IP1} 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+                   sh "scp service_check.sh uedian@${map.UAT_IP1}:${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "ssh uedian@${map.UAT_IP1} 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
             }
             if (params.ENV == "prod" || params.ENV == "rollback-prod") {
                sh "sleep 5s"
                sh "cp /data/build-devops/service_check.sh $workspace/"
                sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
                    echo "${map.PROD_IP1}：查看服务进程是否存在"
-                   sh "scp service_check.sh msyoulu@${map.PROD_IP1}:${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
-                   sh "ssh msyoulu@${map.PROD_IP1} 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+                   sh "scp -P 10022 service_check.sh uedian@${map.PROD_IP1}:${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "ssh -p '10022' 'uedian@47.104.168.140' 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
             }
             }
             }
@@ -239,7 +228,7 @@ pipeline {
                            environment name: 'ENV', value: 'rollback-prod' 
                            } }
             steps {
-                  sh "${map.EDIT_GATEWAT2}"
+                  sh "echo 123"
             }
         }
         stage('部署节点2'){
@@ -258,23 +247,27 @@ pipeline {
             
             if (params.ENV == "dev") {
                    echo "deploy ${ENV} ${map.DEV_IP2}" 
-                   sh "scp ${map.WAR} msyoulu@${map.DEV_IP2}:${map.DEPLOY_DIR}"
-                   sh "ssh msyoulu@${map.DEV_IP2} '${map.DEPLOY_COMMAND}'"
+                   sh "scp ${map.WAR} uedian@${map.DEV_IP2}:${map.DEPLOY_DIR}"
+                   sh "ssh uedian@${map.DEV_IP2} '${map.DEPLOY_COMMAND}'"
             }
             if (params.ENV == "test" || params.ENV == "rollback-test") {
                    echo "deploy ${ENV} ${map.TEST_IP2}" 
-                   sh "scp ${map.WAR} msyoulu@${map.TEST_IP2}:${map.DEPLOY_DIR}"
-                   sh "ssh msyoulu@${map.TEST_IP2} '${map.DEPLOY_COMMAND}'"
+                   sh "scp ${map.WAR} uedian@${map.TEST_IP2}:${map.DEPLOY_DIR}"
+                   sh "ssh uedian@${map.TEST_IP2} '${map.DEPLOY_COMMAND}'"
             }
             if (params.ENV == "uat" || params.ENV == "rollback-uat") {
+                   if (params.UAT_IP2) {
                    echo "deploy ${ENV} ${map.UAT_IP2}" 
-                   sh "scp ${map.WAR_NAME} msyoulu@${map.UAT_IP2}:${map.DEPLOY_DIR}"
-                   sh "ssh msyoulu@${map.UAT_IP2} '${map.DEPLOY_COMMAND}'"
+                   sh "scp ${map.WAR_NAME} uedian@${map.UAT_IP2}:${map.DEPLOY_DIR}"
+                   sh "ssh uedian@${map.UAT_IP2} '${map.DEPLOY_COMMAND}'"
+                   }
             }
             if (params.ENV == "prod" || params.ENV == "rollback-prod") {
+                   if (params.PROD_IP2) {
                    echo "deploy ${ENV} ${map.PROD_IP2}" 
-                   sh "scp ${map.WAR_NAME} msyoulu@${map.PROD_IP2}:${map.DEPLOY_DIR}"
-                   sh "ssh msyoulu@${map.PROD_IP2} '${map.DEPLOY_COMMAND}'"
+                   sh "scp ${map.WAR_NAME} uedian@${map.PROD_IP2}:${map.DEPLOY_DIR}"
+                   sh "ssh uedian@${map.PROD_IP2} '${map.DEPLOY_COMMAND}'"
+                   }
             }
         }
             }
@@ -295,22 +288,26 @@ pipeline {
             if (params.ENV == "dev") {
                sh "sleep 5s"
                    echo "${map.DEV_IP2}：获取服务最后100行日志"
-                   sh "ssh msyoulu@${map.DEV_IP2} 'tail -n100 ${map.APP_LOG}'"
+                   sh "ssh uedian@${map.DEV_IP2} 'tail -n100 ${map.APP_LOG}'"
             }
             if (params.ENV == "test" || params.ENV == "rollback-test") {
                sh "sleep 5s"
                    echo "${map.TEST_IP2}：获取服务最后100行日志"
-                   sh "ssh msyoulu@${map.TEST_IP2} 'tail -n100 ${map.APP_LOG}'"
+                   sh "ssh uedian@${map.TEST_IP2} 'tail -n100 ${map.APP_LOG}'"
             }
             if (params.ENV == "uat" || params.ENV == "rollback-uat") {
+               if (params.UAT_IP2) {
                sh "sleep 5s"
                echo "${map.UAT_IP2}：获取服务最后100行日志"
-               sh "ssh msyoulu@${map.UAT_IP2} 'tail -n100 ${map.APP_LOG}'"
+               sh "ssh uedian@${map.UAT_IP2} 'tail -n100 ${map.APP_LOG}'"
+               }
             }
             if (params.ENV == "prod" || params.ENV == "rollback-prod") {
+               if (params.PROD_IP2) {
                sh "sleep 5s"
                echo "${map.PROD_IP2}：获取服务最后100行日志"
-               sh "ssh msyoulu@${map.PROD_IP2} 'tail -n100 ${map.APP_LOG}'"
+               sh "ssh uedian@${map.PROD_IP2} 'tail -n100 ${map.APP_LOG}'"
+               }
             }
             }
         }
@@ -333,32 +330,36 @@ pipeline {
                sh "cp /data/build-devops/service_check.sh $workspace/"
                sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
                    echo "${map.DEV_IP2}：查看服务进程是否存在"
-                   sh "scp service_check.sh msyoulu@${map.DEV_IP2}:${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
-                   sh "ssh msyoulu@${map.DEV_IP2} 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+                   sh "scp service_check.sh uedian@${map.DEV_IP2}:${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "ssh uedian@${map.DEV_IP2} 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
             }
             if (params.ENV == "test" || params.ENV == "rollback-test") {
                sh "sleep 5s"
                sh "cp /data/build-devops/service_check.sh $workspace/"
                sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
                    echo "${map.TEST_IP2}：查看服务进程是否存在"
-                   sh "scp service_check.sh msyoulu@${map.TEST_IP2}:${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
-                   sh "ssh msyoulu@${map.TEST_IP2} 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+                   sh "scp service_check.sh uedian@${map.TEST_IP2}:${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "ssh uedian@${map.TEST_IP2} 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
             }
             if (params.ENV == "uat" || params.ENV == "rollback-uat") {
+               if (params.UAT_IP2) {
                sh "sleep 5s"
                sh "cp /data/build-devops/service_check.sh $workspace/"
                sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
                    echo "${map.UAT_IP2}：查看服务进程是否存在"
-                   sh "scp service_check.sh msyoulu@${map.UAT_IP2}:${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
-                   sh "ssh msyoulu@${map.UAT_IP2} 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+                   sh "scp service_check.sh uedian@${map.UAT_IP2}:${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "ssh uedian@${map.UAT_IP2} 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+               }
             }
             if (params.ENV == "prod" || params.ENV == "rollback-prod") {
+               if (params.PROD_IP2) {
                sh "sleep 5s"
                sh "cp /data/build-devops/service_check.sh $workspace/"
                sh "sed -i 's/jarname/${map.SERVICE_NAME}/g'  service_check.sh"
                    echo "${map.PROD_IP2}：查看服务进程是否存在"
-                   sh "scp service_check.sh msyoulu@${map.PROD_IP2}:${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
-                   sh "ssh msyoulu@${map.PROD_IP2} 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+                   sh "scp service_check.sh uedian@${map.PROD_IP2}:${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh"
+                   sh "ssh uedian@${map.PROD_IP2} 'sh ${map.DEPLOY_DIR}/service_check-${JOB_NAME}.sh'"
+               }
             }
             }
             }
@@ -369,7 +370,7 @@ pipeline {
                            environment name: 'ENV', value: 'rollback-uat' ; 
                            environment name: 'ENV', value: 'rollback-prod'  } }
             steps {
-                  sh "${map.EDIT_GATEWAT_ALL}"
+                  sh "echo 123"
             }
         }
         stage('上传SVN制品库'){
@@ -398,11 +399,7 @@ pipeline {
             steps{
             sh "echo '${examples_var1} 发布项目：${JOB_NAME} 发布环境：${ENV} 发布版本：${PROJECT_VERSION}.${PROJECT_PATCH} 第${BUILD_NUMBER}次构建' >>/data/packages/version_list.txt"
             sh "echo 进行API自动化测试"
-            sh "rm -rf api-test"
-            sh "cp /data/build-devops/api-test.sh $workspace"
-            sh "sed -i 's#git_url#${map.TEST_GIT}#g' api-test.sh"
-            //git branch: 'master', credentialsId: "chenjingtao-git", url: "${map.TEST_GIT}"
-            sh "sh api-test.sh"
+            
             }
         }
     }

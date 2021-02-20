@@ -1,4 +1,4 @@
-// youluSvnWar.groovy
+// youluSvnResUI.groovy
 
 def call(map) {
 
@@ -10,7 +10,7 @@ def call(map) {
             timestamps()  //日志会有时间
             skipDefaultCheckout()  //删除隐式checkout scm语句
             disableConcurrentBuilds() //禁止并行
-            //buildDiscarder(logRotator(numToKeepStr: '25')) 
+            buildDiscarder(logRotator(numToKeepStr: '5')) 
             timeout(time: 1, unit: 'HOURS')  //流水线超时设置1h
     
         }
@@ -22,13 +22,11 @@ def call(map) {
             choice(
                 description: '选择发布操作类型',
                 name: 'DEPLOY_TYPE',
-                choices: ['test','stable','rollback-test']
+                choices: ['test','rollback-test']
             )
-            string(name: 'APP_VERSION', defaultValue: "${map.APP_VERSION}",description: '构建成功后target目录下的版本号（test）')
-            string(name: 'API_HOST', defaultValue: "${map.API_HOST}",description: '接口自动化测试')
         }
         stages{
-            stage("拉取代码") {
+            stage("拉取前端DevOpsUI代码") {
                 when { 
                     anyOf { 
                         environment name: 'DEPLOY_TYPE', 
@@ -57,96 +55,76 @@ def call(map) {
             //              sh "echo SONAR启动 "
             //              sh "cp /data/build-devops/sonar-project.properties $workspace"
             //              sh "sed -i 's/jobname/${JOB_NAME}/g' sonar-project.properties"
-            //              sh "sed -i 's/pversion/${SVN_TEST_BRANCHES}/g' sonar-project.properties"
             //              sh "sed -i 's#workspace#$workspace#g' sonar-project.properties"
-            //              sh "/data/sonar-scanner-3.0.0.702-linux/bin/sonar-scanner -X -Dsonar.host.url=http://172.16.106.88:9000"
+            //              //sh "/data/sonar-scanner-3.0.0.702-linux/bin/sonar-scanner -X -Dsonar.host.url=http://172.16.106.88:9000"
             //          }
-            //         script {
-            //             timeout(time: 1, unit: "HOURS") {
-            //                 def qg = waitForQualityGate()
-            //                 if (qg.status != 'OK') {
-            //                     error "未通过Sonarqube的代码质量阈检查，请及时修改！failure: ${qg.status}"
-            //                 }
-            //             }
-            //         }
             //     }
             // }
             
-            stage('代码构建'){
-                when { anyOf { environment name: 'DEPLOY_TYPE', value: 'test' } }
+            // 清理
+            stage('清理前端ResUI构建'){
+                when { 
+                    anyOf { 
+                        environment name: 'DEPLOY_TYPE', value: 'test' 
+                    }
+                }
                 steps {
-                    sh "echo ${map.MAVEN_BUILD_COMMAND}"
-                    sh "${map.MAVEN_BUILD_COMMAND}"
+                    sh "echo 清理"
+                    sh "rm -rf ResUI.tar.gz"
                 }
             }
             
-            stage('部署节点'){
+            stage('打包ResUI代码'){
+                when { 
+                    anyOf { 
+                        environment name: 'DEPLOY_TYPE', value: 'test' 
+                    }
+                }
+                steps {
+                    sh "echo 打包"
+                    sh "tar zcvf ResUI.tar.gz * --exclude .svn"
+                }
+            }
+
+            stage('部署前端ResUI节点'){
                 when { 
                     anyOf { 
                             environment name: 'DEPLOY_TYPE', value: 'test' ; 
-                            environment name: 'DEPLOY_TYPE', value: 'rollback-test' 
                     } 
                 }
                 steps {
                     script {
-                        if (params.DEPLOY_TYPE == "test" || params.DEPLOY_TYPE == "rollback-test") {
-                               echo "deploy ${DEPLOY_TYPE} ${map.TEST_IP1}" 
-                               sh "salt ${map.TEST_IP1} cp.get_file salt://${JOB_NAME}/${map.WAR} ${map.DEPLOY_DIR}/${map.WAR_NAME}"
-                               sh "salt ${map.TEST_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
-                        }
+                       sh "sh /data/version_list/mark_version.sh ResUI ${DEPLOY_VERSION}"
+                       echo "deploy ${DEPLOY_TYPE} ${map.TEST_IP1}"
+                       sh "salt ${map.TEST_IP1} cp.get_file salt://${JOB_NAME}/ResUI.tar.gz ${map.DEPLOY_DIR}/${map.ZIP_NAME}"
+                       sh "salt ${map.TEST_IP1} cmd.run '${map.DEPLOY_COMMAND}'"
                     }   
                 }
             }
-            stage('日志输出'){
+        
+         
+            
+            stage('设置Nginx流量切换'){
                 when { 
                     anyOf { 
                         environment name: 'DEPLOY_TYPE', value: 'test' ;
                         environment name: 'DEPLOY_TYPE', value: 'rollback-test'
-                    } 
+                    }
                 }
                 steps {
                     script {
-                        if (params.DEPLOY_TYPE == "test" || params.DEPLOY_TYPE == "rollback-test") {
-                           sh "sleep 5s"
-                               echo "${map.TEST_IP1}：获取服务最后100行日志"
-                               sh "salt ${map.TEST_IP1} cmd.run 'tail -n100 ${map.APP_LOG}'"
-                        }
-                        
-                        sh "sleep 10s"
+                    if (params.DEPLOY_TYPE == "test") {
+                    sh "echo ${map.NGINX_CHANGE_COMMAND}"
+                    sh "salt ${map.TEST_IP1} cmd.run '${map.NGINX_CHANGE_COMMAND}'"
+                    }
+                    if (params.DEPLOY_TYPE == "rollback-test") {
+                    sh "echo ${map.NGINX_ROLLBACK_COMMAND}"
+                    sh "salt ${map.TEST_IP1} cmd.run '${map.NGINX_ROLLBACK_COMMAND}'"
+                    }
                     }
                 }
             }
             
-            stage('API测试'){
-                when { 
-                    anyOf { 
-                       environment name: 'DEPLOY_TYPE', value: 'test' ;
-                       environment name: 'DEPLOY_TYPE', value: 'rollback-test'
-                    } 
-                    
-                }
-                steps{
-                    sh "echo 进行API自动化测试"
-                    // sh "echo '${examples_var1} 发布项目：${JOB_NAME} 发布环境：${DEPLOY_TYPE} 第${BUILD_NUMBER}次构建' >>/data/packages/version_list.txt"
-                    // sh "rm -rf api-test"
-                    // sh "cp /data/build-devops/api-test.sh $workspace"
-                    // sh "sed -i 's#git_url#${map.TEST_GIT}#g' api-test.sh"
-                    // //git branch: 'master', credentialsId: "chenjingtao-git", url: "${map.TEST_GIT}"
-                    // sh "sh api-test.sh"
-                    sh "echo 进行API自动化测试-${map.SVN_APP_NAME}" 
-                    build job: "${map.SVN_APP_NAME}_API测试", wait: true
-                }
-            }
-            stage('上传OSS制品库'){
-            
-            steps{
-            sh "cp /data/build-devops/oss/oss_upload.sh $workspace"
-            sh "sed -i 's/appname/${SVN_APP_NAME}/g' oss_upload.sh"
-            sh "sed -i 's/vversion/${APP_VERSION}/g' oss_upload.sh"
-            sh "sed -i 's#ppackages#${map.WAR}#g' oss_upload.sh"
-            sh "sh oss_upload.sh"
-            }
-            }
             /*stage('上传SVN制品库'){
             when { 
                 anyOf { environment name: 'DEPLOY_TYPE', value: 'stable' 
